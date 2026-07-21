@@ -91,9 +91,9 @@ const NotificationCard = ({ notif, onMarkRead, onDelete }) => {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: 50, transition: { duration: 0.2 } }}
-      className={`group relative flex gap-4 p-5 rounded-2xl border transition-all duration-200 shadow-sm ${
+      className={`group relative flex flex-col sm:flex-row gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl border transition-all duration-200 shadow-sm ${
         notif.isRead
-          ? 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 opacity-70 hover:opacity-100'
+          ? 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 opacity-75 hover:opacity-100'
           : `bg-white dark:bg-slate-900 border-l-4 ${cfg.border.replace('border-', 'border-l-')} border-t border-r border-b border-slate-100 dark:border-slate-800 shadow-md ${cfg.glow}`
       }`}
     >
@@ -102,14 +102,24 @@ const NotificationCard = ({ notif, onMarkRead, onDelete }) => {
         <span className={`absolute top-4 right-4 w-2.5 h-2.5 rounded-full ${cfg.dot} ring-2 ring-white dark:ring-slate-900`} />
       )}
 
-      {/* Icon */}
-      <div className={`shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center text-2xl ${cfg.bg} border ${cfg.border}`}>
-        {cfg.emoji}
+      {/* Header Row on Mobile / Left Column on Desktop */}
+      <div className="flex items-center gap-3 sm:block">
+        <div className={`shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center text-xl sm:text-2xl ${cfg.bg} border ${cfg.border}`}>
+          {cfg.emoji}
+        </div>
+        <div className="flex items-center gap-2 sm:hidden flex-wrap pr-4">
+          <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md ${cfg.badge}`}>
+            {notif.category}
+          </span>
+          <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${priorityCfg.class}`}>
+            {priorityCfg.label}
+          </span>
+        </div>
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <div className="flex flex-wrap items-start gap-2 mb-1">
+        <div className="hidden sm:flex flex-wrap items-start gap-2 mb-1">
           <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md ${cfg.badge}`}>
             {notif.category}
           </span>
@@ -121,35 +131,42 @@ const NotificationCard = ({ notif, onMarkRead, onDelete }) => {
         <h3 className={`text-sm font-black mb-1 leading-snug ${notif.isRead ? 'text-slate-600 dark:text-slate-400' : 'text-slate-900 dark:text-white'}`}>
           {notif.title}
         </h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-3">
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-3">
           {notif.description}
         </p>
 
         {/* Actions */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-600">
-            {dayjs(notif.createdAt).fromNow()}
-          </span>
-          <span className="text-slate-200 dark:text-slate-700">·</span>
-          {!notif.isRead && (
-            <button
-              onClick={() => onMarkRead(notif._id)}
-              className={`text-[11px] font-black px-2.5 py-1 rounded-lg transition-colors ${cfg.color} ${cfg.bg} border ${cfg.border} hover:opacity-80`}
-            >
-              ✓ Mark Read
-            </button>
-          )}
-          {notif.actionUrl && (
-            <Link
-              to={notif.actionUrl}
-              className={`text-[11px] font-black px-2.5 py-1 rounded-lg transition-colors ${cfg.color} ${cfg.bg} border ${cfg.border} hover:opacity-80`}
-            >
-              {notif.actionText || 'View →'}
-            </Link>
-          )}
+        <div className="flex flex-wrap items-center justify-between sm:justify-start gap-2 pt-1">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-400 dark:text-slate-600">
+              {dayjs(notif.createdAt).fromNow()}
+            </span>
+            {!notif.isRead && (
+              <>
+                <span className="text-slate-200 dark:text-slate-700">·</span>
+                <button
+                  onClick={() => onMarkRead(notif._id)}
+                  className={`text-[10px] sm:text-[11px] font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg transition-colors ${cfg.color} ${cfg.bg} border ${cfg.border} hover:opacity-80`}
+                >
+                  ✓ Mark Read
+                </button>
+              </>
+            )}
+            {notif.actionUrl && (
+              <>
+                <span className="text-slate-200 dark:text-slate-700">·</span>
+                <Link
+                  to={notif.actionUrl}
+                  className={`text-[10px] sm:text-[11px] font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg transition-colors ${cfg.color} ${cfg.bg} border ${cfg.border} hover:opacity-80`}
+                >
+                  {notif.actionText || 'View →'}
+                </Link>
+              </>
+            )}
+          </div>
           <button
             onClick={() => onDelete(notif._id)}
-            className="text-[11px] font-bold px-2.5 py-1 rounded-lg text-slate-400 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 border border-transparent hover:border-rose-200 dark:hover:border-rose-500/20 transition-all ml-auto opacity-0 group-hover:opacity-100"
+            className="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-slate-400 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 border border-transparent hover:border-rose-200 dark:hover:border-rose-500/20 transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:ml-auto"
           >
             🗑 Delete
           </button>

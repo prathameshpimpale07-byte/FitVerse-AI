@@ -119,22 +119,22 @@ const HomePage = () => {
           >
 
             
-            <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-slate-900 dark:text-white leading-[1.05] mb-8 tracking-tight">
-              Transform <br/> Your Body, <br/>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-slate-900 dark:text-white leading-[1.05] mb-6 sm:mb-8 tracking-tight break-words">
+              Transform <br className="hidden sm:inline" /> Your Body, <br className="hidden sm:inline" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-secondary-500">Elevate Your Mind.</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 mb-10 max-w-lg leading-relaxed font-medium">
+            <p className="text-lg sm:text-xl md:text-2xl text-slate-600 dark:text-slate-400 mb-8 sm:mb-10 max-w-lg leading-relaxed font-medium">
               The world's smartest AI fitness ecosystem. Generate hyper-personalized workouts, track precise macros, and achieve results faster than ever before.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-5">
-              <Link to="/login" className="group relative px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full font-bold text-lg overflow-hidden flex items-center justify-center gap-3 hover:scale-105 transition-transform duration-300 shadow-xl shadow-slate-900/20 dark:shadow-white/20">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 w-full sm:w-auto">
+              <Link to="/login" className="group relative w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full font-bold text-base sm:text-lg overflow-hidden flex items-center justify-center gap-3 hover:scale-105 transition-transform duration-300 shadow-xl shadow-slate-900/20 dark:shadow-white/20">
                 <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 dark:via-black/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
                 Start Free Trial <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
               </Link>
-              <a href="#about" className="px-8 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-full font-bold text-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm flex items-center justify-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center">
+              <a href="#about" className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-full font-bold text-base sm:text-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm flex items-center justify-center gap-3">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center">
                   <FaPlay className="text-primary-600 dark:text-primary-400 text-xs ml-0.5" />
                 </div>
                 Watch Demo
@@ -145,11 +145,11 @@ const HomePage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8, duration: 0.8 }}
-              className="mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6"
+              className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6"
             >
-              <div className="flex -space-x-4">
+              <div className="flex -space-x-3 sm:-space-x-4">
                 {[1, 2, 3, 4].map((num) => (
-                  <img key={num} className="w-12 h-12 rounded-full border-2 border-slate-50 dark:border-slate-950 object-cover shadow-sm" src={`https://randomuser.me/api/portraits/men/${num}.jpg`} alt="User" />
+                  <img key={num} className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-slate-50 dark:border-slate-950 object-cover shadow-sm" src={`https://randomuser.me/api/portraits/men/${num}.jpg`} alt="User" />
                 ))}
               </div>
               <div>
@@ -157,7 +157,7 @@ const HomePage = () => {
                   {[1,2,3,4,5].map(i => <FaStar key={i} />)}
                   <span className="text-slate-900 dark:text-white font-bold ml-2">5.0</span>
                 </div>
-                <div className="text-sm font-bold text-slate-600 dark:text-slate-400">Trusted by 20,000+ athletes</div>
+                <div className="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400">Trusted by 20,000+ athletes</div>
               </div>
             </motion.div>
           </motion.div>

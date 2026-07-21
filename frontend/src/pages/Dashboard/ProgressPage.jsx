@@ -203,7 +203,7 @@ const ProgressPage = () => {
           {/* Core Stats */}
           <div>
             <p className="text-[10px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-widest mb-3">Core Stats</p>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <Field label="Weight kg" name="weight" value={formData.weight} onChange={handleChange} placeholder="72.5" accent="violet" />
               <Field label="Body Fat %" name="bodyFat" value={formData.bodyFat} onChange={handleChange} placeholder="15.0" accent="violet" />
               <Field label="Muscle kg" name="muscleMass" value={formData.muscleMass} onChange={handleChange} placeholder="38.0" accent="violet" />
@@ -215,7 +215,7 @@ const ProgressPage = () => {
           {/* Measurements */}
           <div>
             <p className="text-[10px] font-black text-sky-600 dark:text-sky-400 uppercase tracking-widest mb-3">Measurements (cm)</p>
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <Field label="Chest" name="chest" value={formData.chest} onChange={handleChange} placeholder="98" accent="sky" />
               <Field label="Waist" name="waist" value={formData.waist} onChange={handleChange} placeholder="80" accent="sky" />
               <Field label="Hips" name="hips" value={formData.hips} onChange={handleChange} placeholder="95" accent="sky" />
@@ -228,7 +228,7 @@ const ProgressPage = () => {
           {/* Activity */}
           <div>
             <p className="text-[10px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest mb-3">Activity</p>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <Field label="Workouts" name="workoutsCompleted" value={formData.workoutsCompleted} onChange={handleChange} placeholder="1" step="1" accent="orange" />
               <Field label="Calories Burned" name="caloriesBurned" value={formData.caloriesBurned} onChange={handleChange} placeholder="450" step="1" accent="orange" />
               <Field label="Water (L)" name="waterIntake" value={formData.waterIntake} onChange={handleChange} placeholder="3.0" accent="orange" />
@@ -242,7 +242,7 @@ const ProgressPage = () => {
               Clear
             </button>
             <button type="submit" disabled={submitting}
-              className="flex items-center gap-2 px-7 py-3 bg-violet-600 hover:bg-violet-700 text-white text-sm font-black rounded-2xl shadow-lg shadow-violet-500/20 transition-all disabled:opacity-50">
+              className="flex items-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 bg-violet-600 hover:bg-violet-700 text-white text-sm font-black rounded-2xl shadow-lg shadow-violet-500/20 transition-all disabled:opacity-50">
               {submitting
                 ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
                 : <><FaPlus size={11} /> Save Log</>
@@ -266,13 +266,13 @@ const ProgressPage = () => {
               { icon: <FaDumbbell />, label: 'BMI', value: calcBMI(latestLog?.weight) || '—', color: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-50 dark:bg-sky-500/10' },
               { icon: <FaFire />, label: 'Calories (last)', value: latestLog?.caloriesBurned ? `${latestLog.caloriesBurned} kcal` : '—', color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-500/10' },
             ].map((s, i) => (
-              <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center gap-3">
-                <span className={`w-9 h-9 rounded-xl ${s.bg} ${s.color} flex items-center justify-center text-sm shrink-0`}>
+              <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 sm:p-4 flex items-center gap-2.5 sm:gap-3">
+                <span className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl ${s.bg} ${s.color} flex items-center justify-center text-xs sm:text-sm shrink-0`}>
                   {s.icon}
                 </span>
-                <div>
-                  <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">{s.label}</p>
-                  <p className={`text-base font-black ${s.color}`}>{s.value}</p>
+                <div className="min-w-0">
+                  <p className="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider truncate">{s.label}</p>
+                  <p className={`text-sm sm:text-base font-black truncate ${s.color}`}>{s.value}</p>
                 </div>
               </div>
             ))}
@@ -280,13 +280,13 @@ const ProgressPage = () => {
 
           {/* Charts — only if at least 2 points */}
           {logs.filter(l => l.weight).length >= 2 && (
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5">
                 <p className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4">Weight Trend</p>
                 <div className="h-44"><Line data={weightData} options={chartOptions('kg')} /></div>
               </div>
               {logs.filter(l => l.bodyFat).length >= 2 && (
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5">
                   <p className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4">Body Fat Trend</p>
                   <div className="h-44"><Line data={fatData} options={chartOptions('%')} /></div>
                 </div>
@@ -301,16 +301,16 @@ const ProgressPage = () => {
               <span className="text-xs text-slate-400 dark:text-slate-500 font-semibold">{logs.length} entries</span>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-xs sm:text-sm min-w-[500px]">
                 <thead>
                   <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-black">
-                    <th className="px-5 py-3 text-left">Date</th>
-                    <th className="px-4 py-3 text-center">Weight</th>
-                    <th className="px-4 py-3 text-center">Fat %</th>
-                    <th className="px-4 py-3 text-center">BMI</th>
-                    <th className="px-4 py-3 text-center">Calories</th>
-                    <th className="px-4 py-3 text-center">Water</th>
-                    <th className="px-4 py-3 text-right"></th>
+                    <th className="px-4 sm:px-5 py-3 text-left">Date</th>
+                    <th className="px-3 sm:px-4 py-3 text-center">Weight</th>
+                    <th className="px-3 sm:px-4 py-3 text-center">Fat %</th>
+                    <th className="px-3 sm:px-4 py-3 text-center">BMI</th>
+                    <th className="px-3 sm:px-4 py-3 text-center">Calories</th>
+                    <th className="px-3 sm:px-4 py-3 text-center">Water</th>
+                    <th className="px-3 sm:px-4 py-3 text-right"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -322,29 +322,29 @@ const ProgressPage = () => {
                         exit={{ opacity: 0, height: 0 }}
                         className="border-b border-slate-50 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors"
                       >
-                        <td className="px-5 py-3.5 font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                        <td className="px-4 sm:px-5 py-3.5 font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">
                           {dayjs(log.date).format('DD MMM YYYY')}
                         </td>
-                        <td className="px-4 py-3.5 text-center">
+                        <td className="px-3 sm:px-4 py-3.5 text-center whitespace-nowrap">
                           <span className="text-violet-600 dark:text-violet-400 font-bold">{log.weight ? `${log.weight} kg` : '—'}</span>
                         </td>
-                        <td className="px-4 py-3.5 text-center">
+                        <td className="px-3 sm:px-4 py-3.5 text-center whitespace-nowrap">
                           <span className="text-emerald-600 dark:text-emerald-400 font-bold">{log.bodyFat ? `${log.bodyFat}%` : '—'}</span>
                         </td>
-                        <td className="px-4 py-3.5 text-center">
+                        <td className="px-3 sm:px-4 py-3.5 text-center whitespace-nowrap">
                           <span className="text-sky-600 dark:text-sky-400 font-bold">{calcBMI(log.weight) || '—'}</span>
                         </td>
-                        <td className="px-4 py-3.5 text-center">
+                        <td className="px-3 sm:px-4 py-3.5 text-center whitespace-nowrap">
                           <span className="text-orange-500 dark:text-orange-400 font-semibold">{log.caloriesBurned ? `${log.caloriesBurned}` : '—'}</span>
                         </td>
-                        <td className="px-4 py-3.5 text-center">
+                        <td className="px-3 sm:px-4 py-3.5 text-center whitespace-nowrap">
                           <span className="text-slate-500 dark:text-slate-400 font-semibold">{log.waterIntake ? `${log.waterIntake}L` : '—'}</span>
                         </td>
-                        <td className="px-4 py-3.5 text-right">
+                        <td className="px-3 sm:px-4 py-3.5 text-right whitespace-nowrap">
                           <button
                             onClick={() => handleDelete(log._id)}
                             disabled={deletingId === log._id}
-                            className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all disabled:opacity-40 cursor-pointer mx-auto"
+                            className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all disabled:opacity-40 cursor-pointer ml-auto"
                             title="Delete log"
                           >
                             {deletingId === log._id
