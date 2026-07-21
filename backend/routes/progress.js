@@ -1,0 +1,10 @@
+var express2 = require("express");
+    var router = express2.Router();
+    var { getProgress, addProgress, updateProgress, deleteProgress, getOverview } = require('../controllers/progressController.js');
+    var { protect } = require('../middleware/auth.js');
+    router.get("/overview", protect, getOverview);
+    router.get("/", protect, getProgress);
+    router.post("/", protect, addProgress);
+    router.put("/:id", protect, updateProgress);
+    router.delete("/:id", protect, deleteProgress);
+    module.exports = router;
