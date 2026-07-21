@@ -24,7 +24,7 @@
 | :--- | :--- | :--- |
 | 🌐 **Frontend** | Vercel | [View Live Site →](https://fit-verse-ai-07.vercel.app/) |
 | ⚙️ **Backend** | Render | [API Server →](https://fitverse-ai-2.onrender.com) |
-| 📖 **API Docs** | Postman | [Documentation →](https://documenter.getpostman.com/view/fitverse-ai) |
+| 📖 **API Docs** | Postman | [Download Postman Collection (.json) →](https://raw.githubusercontent.com/prathameshpimpale07-byte/FitVerse-AI/main/FitVerse_AI.postman_collection.json) |
 | ▶️ **Demo Video** | YouTube | [Watch on YouTube →](https://youtube.com) |
 
 ---
