@@ -7,6 +7,23 @@ import { FaEye, FaEyeSlash, FaCheckCircle, FaDumbbell, FaArrowRight, FaArrowLeft
 import { GoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 
+const InputWithIcon = ({ id, label, icon: Icon, type = "text", register, validation, errors }) => (
+  <div className="space-y-1">
+    <label className="text-sm font-bold text-slate-700 ml-1">{label}</label>
+    <div className="relative flex items-center">
+      {Icon && <div className="absolute left-4 text-slate-400"><Icon /></div>}
+      <input 
+        type={type} 
+        id={id}
+        {...register(id, validation)} 
+        className={`input-glass ${Icon ? 'pl-11' : 'pl-5'}`} 
+        placeholder={label} 
+      />
+    </div>
+    {errors[id] && <p className="text-red-500 text-xs mt-1 ml-1 font-medium">{errors[id].message}</p>}
+  </div>
+);
+
 const RegisterPage = () => {
   const { register: authRegister, login, setAuthSession } = useAuth();
   const navigate = useNavigate();
@@ -25,94 +42,6 @@ const RegisterPage = () => {
       workoutDays: '3'
     }
   });
-
-  const pwd = watch('password') || '';
-  const formData = watch();
-
-  const getStrength = (p) => {
-    let s = 0;
-    if (p.length > 5) s += 1;
-    if (p.length > 8) s += 1;
-    if (/[A-Z]/.test(p)) s += 1;
-    if (/[0-9]/.test(p)) s += 1;
-    if (/[^A-Za-z0-9]/.test(p)) s += 1;
-    return s;
-  };
-  const strength = getStrength(pwd);
-  const strengthColor = strength <= 2 ? 'bg-red-500' : strength <= 3 ? 'bg-yellow-500' : 'bg-emerald-500';
-
-  const nextStep = async () => {
-    let valid = false;
-    if (step === 1) {
-      valid = await trigger(['name', 'email', 'phone', 'password', 'confirmPassword', 'terms']);
-    } else if (step === 2) {
-      valid = await trigger(['age', 'height', 'weight']);
-    } else if (step === 3) {
-      valid = true;
-    }
-    
-    if (valid) setStep((prev) => Math.min(prev + 1, totalSteps));
-  };
-
-  const prevStep = () => {
-    setStep((prev) => Math.max(prev - 1, 1));
-  };
-
-  const onSubmit = async (data) => {
-    setLoading(true);
-    try {
-      await authRegister(data);
-      navigate('/dashboard');
-    } catch (err) {
-      toast.error(err?.message || 'Registration failed');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleSuccess = async (credentialResponse) => {
-    try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://fitverse-ai-2.onrender.com/api';
-      const res = await fetch(`${apiUrl}/auth/google`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token: credentialResponse.credential }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setAuthSession(data.user, data.token);
-        toast.success(`Welcome to FitVerse, ${data.user.name}! 🚀`);
-        navigate('/dashboard');
-      } else {
-        toast.error(data.message || 'Google Signup failed');
-      }
-    } catch (err) {
-      toast.error('Network error during Google Signup');
-    }
-  };
-
-  const handleGoogleError = () => {
-    toast.error('Google Signup failed');
-  };
-
-  const InputWithIcon = ({ id, label, icon: Icon, type = "text", validation }) => (
-    <div className="space-y-1">
-      <label className="text-sm font-bold text-slate-700 ml-1">{label}</label>
-      <div className="relative flex items-center">
-        {Icon && <div className="absolute left-4 text-slate-400"><Icon /></div>}
-        <input 
-          type={type} 
-          id={id}
-          {...register(id, validation)} 
-          className={`input-glass ${Icon ? 'pl-11' : 'pl-5'}`} 
-          placeholder={label} 
-        />
-      </div>
-      {errors[id] && <p className="text-red-500 text-xs mt-1 ml-1 font-medium">{errors[id].message}</p>}
-    </div>
-  );
 
   return (
     <div className="min-h-screen flex bg-transparent font-sans overflow-hidden">
@@ -204,9 +133,9 @@ const RegisterPage = () => {
                 {step === 1 && (
                   <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
                     
-                    <InputWithIcon id="name" label="Full Name" icon={FaUser} validation={{ required: 'Name is required' }} />
-                    <InputWithIcon id="email" label="Email Address" type="email" icon={FaEnvelope} validation={{ required: 'Email is required', pattern: { value: /^\S+@\S+$/i, message: 'Invalid email' } }} />
-                    <InputWithIcon id="phone" label="Phone Number" type="tel" icon={FaPhoneAlt} validation={{ required: 'Phone is required' }} />
+                    <InputWithIcon id="name" label="Full Name" icon={FaUser} validation={{ required: 'Name is required' }} register={register} errors={errors} />
+                    <InputWithIcon id="email" label="Email Address" type="email" icon={FaEnvelope} validation={{ required: 'Email is required', pattern: { value: /^\S+@\S+$/i, message: 'Invalid email' } }} register={register} errors={errors} />
+                    <InputWithIcon id="phone" label="Phone Number" type="tel" icon={FaPhoneAlt} validation={{ required: 'Phone is required' }} register={register} errors={errors} />
                     
                     <div className="space-y-1">
                       <label className="text-sm font-bold text-slate-700 ml-1">Password</label>
