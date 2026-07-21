@@ -168,8 +168,7 @@ const AIPage = () => {
         height = 100vh − 64px (navbar) − 2×padding (32px each side on lg = 64px)  →  calc(100vh - 8rem)
     */
     <div
-      className="flex flex-col bg-slate-950 rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-black/40 max-w-4xl mx-auto w-full"
-      style={{ height: 'calc(100vh - 8rem)' }}
+      className="flex flex-col bg-slate-950 rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-black/40 max-w-4xl mx-auto w-full h-[calc(100vh-5.5rem)] sm:h-[calc(100vh-8rem)] min-h-[450px]"
     >
 
       {/* ── Top bar ─────────────────────────────────────────── */}
@@ -355,36 +354,36 @@ const AIPage = () => {
           e.preventDefault();
           send();
         }}
-        className="px-4 sm:px-5 py-3.5 bg-slate-900 border-t border-slate-800 flex gap-3 items-center shrink-0"
+        className="p-2.5 sm:px-5 sm:py-3.5 bg-slate-900 border-t border-slate-800 flex gap-2 sm:gap-3 items-center shrink-0"
       >
         <input
           ref={inputRef}
           type="text"
-          placeholder="Ask anything — workouts, diet, recovery, supplements..."
+          placeholder="Ask AI coach..."
           value={input}
           onChange={e => setInput(e.target.value)}
           disabled={loading}
-          className="flex-1 bg-slate-800 border border-slate-700 focus:border-violet-500 text-white placeholder:text-slate-500 px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50"
+          className="flex-1 min-w-0 bg-slate-800 border border-slate-700 focus:border-violet-500 text-white placeholder:text-slate-500 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50"
         />
         <button
           type="button"
           onClick={toggleListen}
           disabled={loading}
-          className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+          className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center transition-all shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
             isListening 
               ? 'bg-rose-500/20 text-rose-500 animate-pulse border border-rose-500/50' 
               : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 border border-slate-700'
           }`}
           title="Click to speak"
         >
-          <FaMicrophone size={14} />
+          <FaMicrophone className="text-xs sm:text-sm" />
         </button>
         <button
           type="submit"
           disabled={loading || !input.trim()}
-          className="w-11 h-11 bg-gradient-to-br from-violet-500 to-indigo-600 text-white rounded-xl flex items-center justify-center hover:opacity-90 transition-all shadow-lg shadow-violet-500/25 shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-br from-violet-500 to-indigo-600 text-white rounded-xl flex items-center justify-center hover:opacity-90 transition-all shadow-lg shadow-violet-500/25 shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          <FaPaperPlane size={13} />
+          <FaPaperPlane className="text-xs sm:text-sm" />
         </button>
       </form>
     </div>

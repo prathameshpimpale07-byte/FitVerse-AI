@@ -98,7 +98,7 @@ const WorkoutHome = () => {
         
         {/* Left Navigation Sidebar */}
         {activeTab !== 'player' && (
-          <aside className="lg:col-span-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] p-4 shadow-sm flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible scrollbar-none w-full mb-4 lg:mb-0 lg:space-y-1">
+          <aside className="lg:col-span-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl sm:rounded-[2rem] p-2.5 sm:p-4 shadow-sm flex flex-row lg:flex-col gap-1.5 sm:gap-2 overflow-x-auto lg:overflow-visible scrollbar-none w-full mb-4 lg:mb-0 lg:space-y-1">
             <span className="text-[10px] text-slate-400 dark:text-slate-500 font-extrabold uppercase tracking-widest pl-3 hidden lg:block mb-3">
               Workout Sections
             </span>
@@ -109,13 +109,13 @@ const WorkoutHome = () => {
                   setActiveTab(item.id);
                   if (item.id !== 'library') setSelectedCategory(null);
                 }}
-                className={`flex items-center gap-3 px-5 py-3 rounded-2xl font-bold text-xs uppercase transition-all tracking-wider cursor-pointer shrink-0 whitespace-nowrap lg:w-full lg:py-3.5 lg:px-4 ${
+                className={`flex items-center gap-2 sm:gap-3 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-bold text-[11px] sm:text-xs uppercase transition-all tracking-wider cursor-pointer shrink-0 whitespace-nowrap lg:w-full lg:py-3.5 lg:px-4 ${
                   activeTab === item.id || (item.id === 'categories' && activeTab === 'library')
                     ? 'bg-primary-600 text-white shadow-md shadow-primary-500/25'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                <item.icon className="text-base shrink-0" />
+                <item.icon className="text-sm sm:text-base shrink-0" />
                 <span>{item.name}</span>
               </button>
             ))}
