@@ -1,0 +1,240 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    @apply bg-slate-50 text-slate-800 antialiased;
+    min-height: 100vh;
+  }
+
+  .dark body {
+    @apply bg-[#0b0f1a] text-slate-200;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    @apply bg-slate-700;
+  }
+
+  /* Smooth transitions for dark mode toggle */
+  *, *::before, *::after {
+    transition-property: background-color, border-color, color, box-shadow;
+    transition-duration: 200ms;
+    transition-timing-function: ease;
+  }
+
+  /* Prevent transition flicker on interactive elements */
+  button, a, input, select, textarea {
+    transition-property: background-color, border-color, color, box-shadow, opacity, transform;
+  }
+}
+
+@layer components {
+
+  /* ══════════════════════════════════════════════
+     GLASS CARDS — core glassmorphism system
+  ══════════════════════════════════════════════ */
+  .glass {
+    @apply bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/60 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)];
+  }
+
+  .glass-card, .glass-card-solid, .clean-card {
+    @apply bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl rounded-2xl border border-white/60 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300;
+  }
+
+  .clean-card-hover, .glass-card-hover {
+    @apply glass-card hover:shadow-[0_8px_32px_-6px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_8px_32px_-6px_rgba(0,0,0,0.6)] hover:-translate-y-0.5;
+  }
+
+  /* Dark‑mode background for pages */
+  .dark-surface {
+    @apply bg-[#0b0f1a];
+  }
+  .dark-card {
+    @apply bg-slate-900/80 border-white/5;
+  }
+
+  /* ══════════════════════════════════════════════
+     SIDEBAR
+  ══════════════════════════════════════════════ */
+  .sidebar-root {
+    @apply bg-white/40 dark:bg-slate-950/40 backdrop-blur-2xl border-r border-white/60 dark:border-white/5;
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold
+           text-slate-600 dark:text-slate-400
+           hover:bg-slate-100 dark:hover:bg-white/5
+           hover:text-slate-900 dark:hover:text-white
+           transition-all duration-150;
+  }
+
+  .sidebar-link-active {
+    @apply bg-primary-50 dark:bg-primary-500/10
+           text-primary-700 dark:text-primary-400
+           shadow-sm;
+  }
+
+  /* ══════════════════════════════════════════════
+     NAVBAR
+  ══════════════════════════════════════════════ */
+  .navbar-root {
+    @apply bg-white/40 dark:bg-slate-950/40 backdrop-blur-2xl
+           border-b border-white/60 dark:border-white/5
+           shadow-[0_1px_12px_-1px_rgba(0,0,0,0.04)]
+           dark:shadow-[0_1px_12px_-1px_rgba(0,0,0,0.4)];
+  }
+
+  /* ══════════════════════════════════════════════
+     BUTTONS
+  ══════════════════════════════════════════════ */
+  .btn-primary {
+    @apply px-5 py-2.5 rounded-xl font-bold text-sm text-white
+           bg-primary-600 hover:bg-primary-700
+           shadow-sm hover:shadow-primary-500/20 hover:shadow-md
+           transition-all duration-150;
+  }
+
+  .btn-secondary {
+    @apply px-5 py-2.5 rounded-xl font-bold text-sm text-white
+           bg-secondary-600 hover:bg-secondary-700
+           shadow-sm transition-all duration-150;
+  }
+
+  .btn-ghost {
+    @apply px-4 py-2 rounded-xl font-medium text-sm
+           text-slate-600 dark:text-slate-400
+           hover:bg-slate-100 dark:hover:bg-white/5
+           hover:text-slate-900 dark:hover:text-white
+           transition-all duration-150;
+  }
+
+  .btn-outline {
+    @apply px-5 py-2.5 rounded-xl font-bold text-sm
+           text-slate-700 dark:text-slate-200
+           bg-white dark:bg-transparent
+           border border-slate-300 dark:border-slate-600
+           hover:bg-slate-50 dark:hover:bg-white/5
+           transition-all duration-150;
+  }
+
+  /* ══════════════════════════════════════════════
+     INPUTS
+  ══════════════════════════════════════════════ */
+  .input-glass, .input-clean {
+    @apply w-full px-4 py-3 rounded-xl text-sm font-medium
+           text-slate-800 dark:text-slate-100
+           bg-slate-50 dark:bg-white/5
+           border border-slate-200 dark:border-white/10
+           placeholder-slate-400 dark:placeholder-slate-500
+           outline-none transition-all duration-200;
+  }
+  .input-glass:focus, .input-clean:focus {
+    @apply border-primary-500 ring-2 ring-primary-500/20
+           bg-white dark:bg-white/10;
+  }
+
+  /* ══════════════════════════════════════════════
+     BADGES
+  ══════════════════════════════════════════════ */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold
+           bg-primary-50 dark:bg-primary-500/10
+           text-primary-700 dark:text-primary-400
+           border border-primary-200 dark:border-primary-500/20;
+  }
+  .badge-secondary {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold
+           bg-secondary-50 dark:bg-secondary-500/10
+           text-secondary-700 dark:text-secondary-400
+           border border-secondary-200 dark:border-secondary-500/20;
+  }
+  .badge-accent { @apply badge-secondary; }
+
+  /* ══════════════════════════════════════════════
+     SECTION UTILS
+  ══════════════════════════════════════════════ */
+  .section-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16;
+  }
+  .section-title {
+    @apply text-3xl font-black text-slate-900 dark:text-white mb-4;
+  }
+  .section-subtitle {
+    @apply text-slate-500 dark:text-slate-400 text-lg mb-12 max-w-2xl mx-auto;
+  }
+
+  /* ══════════════════════════════════════════════
+     GRADIENT TEXT
+  ══════════════════════════════════════════════ */
+  .gradient-text, .text-gradient {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-secondary-500;
+  }
+  .gradient-text-accent {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500;
+  }
+
+  /* Orbs disabled */
+  .orb, .orb-primary, .orb-secondary, .orb-accent {
+    display: none;
+  }
+
+  /* Scrollbar hide */
+  .sidebar-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+  .sidebar-scroll:hover {
+    scrollbar-color: rgba(148,163,184,0.4) transparent;
+  }
+}
+
+@layer utilities {
+  .fade-in-up {
+    animation: fadeInUp 0.4s ease-out forwards;
+  }
+
+  /* Glass background utilities */
+  .bg-glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .dark .bg-glass {
+    background: rgba(15, 23, 42, 0.7);
+  }
+
+  .bg-glass-dark {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
