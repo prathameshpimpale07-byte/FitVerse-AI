@@ -1,0 +1,12 @@
+var express2 = require("express");
+    var router = express2.Router();
+var { register, login, getProfile, googleLogin, forgotPassword, resetPassword, changePassword } = require('../controllers/authController.js');
+    var { protect } = require('../middleware/auth.js');
+    router.post("/register", register);
+    router.post("/login", login);
+    router.post("/google", googleLogin);
+    router.post("/forgotpassword", forgotPassword);
+    router.put("/resetpassword/:resettoken", resetPassword);
+    router.put("/changepassword", changePassword);
+    router.get("/profile", protect, getProfile);
+    module.exports = router;
