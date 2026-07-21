@@ -371,23 +371,23 @@ const DashboardLayout = () => {
 
       {/* Mobile FAB */}
       <button onClick={() => setSidebarOpen(true)}
-        className="lg:hidden fixed bottom-6 left-4 z-40 w-12 h-12 rounded-2xl bg-primary-600 text-white flex items-center justify-center shadow-lg shadow-primary-600/30">
-        <HiMenu size={22} />
+        className="lg:hidden fixed bottom-5 left-4 z-30 w-11 h-11 rounded-2xl bg-primary-600 text-white flex items-center justify-center shadow-lg shadow-primary-600/30">
+        <HiMenu size={20} />
       </button>
 
       {/* Main Content */}
-      <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
+      <div className="flex-1 lg:ml-64 flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
 
         {/* ── Top Navbar ── */}
-        <header className="sticky top-0 z-30 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 navbar-root">
+        <header className="sticky top-0 z-30 h-16 flex items-center justify-between px-3 sm:px-6 lg:px-8 navbar-root">
 
           {/* Mobile brand */}
           <div className="flex items-center gap-3 lg:hidden">
             <Link to="/" className="flex items-center gap-2 group shrink-0">
-              <div className="w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center transition-transform group-hover:scale-105 shadow-lg shadow-primary-500/20">
-                <FaDumbbell className="text-white text-xl" />
+              <div className="w-9 h-9 rounded-xl bg-primary-600 flex items-center justify-center transition-transform group-hover:scale-105 shadow-lg shadow-primary-500/20">
+                <FaDumbbell className="text-white text-lg" />
               </div>
-              <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">FitVerse AI</span>
+              <span className="text-xl font-black text-slate-900 dark:text-white tracking-tight">FitVerse AI</span>
             </Link>
           </div>
 
@@ -443,26 +443,26 @@ const DashboardLayout = () => {
           </div>
 
           {/* Right Controls */}
-          <div className="flex items-center gap-1.5 sm:gap-2 ml-auto">
+          <div className="flex items-center gap-1 sm:gap-2 ml-auto">
 
             {/* Theme Toggle */}
             <button onClick={toggleTheme}
-              className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-all">
-              {isDark ? <HiSun size={20} /> : <HiMoon size={20} />}
+              className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-all">
+              {isDark ? <HiSun size={18} /> : <HiMoon size={18} />}
             </button>
 
             {/* Bell */}
             <div className="relative" ref={bellRef}>
               <button onClick={() => setBellOpen(prev => !prev)}
-                className={`relative p-2.5 rounded-xl transition-all ${
+                className={`relative p-2 rounded-xl transition-all ${
                   bellOpen
                     ? 'bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400'
                     : 'text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-slate-100 dark:hover:bg-white/5'
                 }`}>
-                <HiBell size={20} />
+                <HiBell size={18} />
                 {unreadCount > 0 && (
                   <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}
-                    className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center px-1 border-2 border-white dark:border-slate-950 shadow-sm">
+                    className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center px-1 border-2 border-white dark:border-slate-950 shadow-sm">
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </motion.span>
                 )}
@@ -473,26 +473,26 @@ const DashboardLayout = () => {
             </div>
 
             {/* Divider */}
-            <div className="w-px h-6 bg-slate-200 dark:bg-white/10 mx-1" />
+            <div className="w-px h-5 bg-slate-200 dark:bg-white/10 mx-0.5" />
 
             {/* ── Navbar Profile Pill ── */}
             <Link to="/dashboard/profile"
-              className="flex items-center gap-2.5 pl-1 pr-3 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all group">
+              className="flex items-center gap-2 pl-1 pr-2 sm:pr-3 py-1 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all group">
               {/* Avatar */}
               {user?.avatar ? (
                 <img src={user.avatar} alt={user?.name}
-                  className="w-9 h-9 rounded-xl object-cover border-2 border-slate-200 dark:border-slate-700 shadow-sm shrink-0 group-hover:border-primary-400 transition-all" />
+                  className="w-8 h-8 rounded-xl object-cover border-2 border-slate-200 dark:border-slate-700 shadow-sm shrink-0 group-hover:border-primary-400 transition-all" />
               ) : (
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 text-white flex items-center justify-center text-sm font-black shrink-0 shadow-sm">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 text-white flex items-center justify-center text-xs font-black shrink-0 shadow-sm">
                   {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
               )}
               {/* Name */}
               <div className="hidden sm:block text-left">
-                <p className="text-sm font-black text-slate-800 dark:text-white leading-tight group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                <p className="text-xs font-black text-slate-800 dark:text-white leading-tight group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                   {user?.name || 'User'}
                 </p>
-                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 capitalize mt-0.5">
+                <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 capitalize mt-0.5">
                   {user?.role === 'admin' ? 'Administrator' : user?.role === 'trainer' ? 'Trainer' : 'Member'}
                 </p>
               </div>
@@ -501,7 +501,7 @@ const DashboardLayout = () => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full">
+        <main className="flex-1 p-2.5 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full box-border overflow-x-hidden">
           <Outlet />
         </main>
       </div>

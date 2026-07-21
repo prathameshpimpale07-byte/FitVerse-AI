@@ -24,14 +24,14 @@ const EMPTY_FORM = {
 };
 
 const Field = ({ label, name, value, onChange, placeholder, step = '0.1', accent = 'violet' }) => (
-  <div>
-    <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
+  <div className="min-w-0 w-full">
+    <label className="block text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider truncate">
       {label}
     </label>
     <input
       type="number" step={step} name={name}
       value={value} onChange={onChange} placeholder={placeholder}
-      className={`w-full px-3.5 py-2.5 rounded-xl text-sm font-medium
+      className={`w-full px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium
         bg-slate-50 dark:bg-slate-800/60
         border border-slate-200 dark:border-slate-700
         text-slate-800 dark:text-white
