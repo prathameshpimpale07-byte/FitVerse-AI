@@ -6,7 +6,7 @@ import api from '../services/api';
 
 const NotificationContext = createContext(null);
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'https://fitverse-ai-2.onrender.com';
 
 // ── Category emoji map ───────────────────────────────────────────────────────
 const CATEGORY_EMOJI = {

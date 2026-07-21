@@ -26,7 +26,8 @@ const ResetPasswordPage = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/resetpassword/${token}`, {
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://fitverse-ai-2.onrender.com/api';
+      const response = await fetch(`${apiUrl}/auth/resetpassword/${token}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })

@@ -15,7 +15,8 @@ const HomePage = () => {
     e.preventDefault();
     setContactStatus('sending');
     try {
-      const response = await fetch('http://localhost:5000/api/contact', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://fitverse-ai-2.onrender.com/api';
+      const response = await fetch(`${apiUrl}/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(contactForm)

@@ -72,7 +72,8 @@ const RegisterPage = () => {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const res = await fetch('http://localhost:5000/api/auth/google', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://fitverse-ai-2.onrender.com/api';
+      const res = await fetch(`${apiUrl}/auth/google`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
