@@ -1,7 +1,20 @@
-# 🏋️‍♂️ FitVerse AI — Next-Gen AI Fitness & Health Ecosystem
+# 🏋️‍♂️ FitVerse AI — Next-Gen MERN Stack AI Fitness & Health Ecosystem
 
-> **Transform Your Body, Elevate Your Mind.**  
-> A full-stack, evidence-based AI fitness SaaS platform powered by **Retrieval-Augmented Generation (RAG)**, Google Gemini AI, Web Speech Voice Input, Socket.IO Real-Time Notifications, and a stunning **Glassmorphic UI**.
+<div align="center">
+
+![MERN Stack](https://img.shields.io/badge/MERN_Stack-MongoDB_%7C_Express_%7C_React_%7C_Node.js-00ED64?style=for-the-badge&logo=mongodb&logoColor=white)
+![Google Gemini AI](https://img.shields.io/badge/AI_Engine-RAG_%7C_Google_Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white)
+![Vite](https://img.shields.io/badge/Frontend-React_18_%7C_Vite_%7C_Tailwind-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Socket.IO](https://img.shields.io/badge/Realtime-Socket.IO_WebSockets-010101?style=for-the-badge&logo=socket.io&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+
+</div>
+
+<p align="center">
+  <b>⚡ Built with MERN Stack (MongoDB, Express.js, React 18, Node.js) ⚡</b><br />
+  <b>Transform Your Body, Elevate Your Mind.</b><br />
+  A full-stack, evidence-based AI fitness SaaS platform powered by <b>Retrieval-Augmented Generation (RAG)</b>, Google Gemini AI, Web Speech Voice Input, Socket.IO Real-Time Notifications, and a stunning <b>Glassmorphic UI</b>.
+</p>
 
 ---
 
@@ -16,26 +29,40 @@
 
 ---
 
-## 🎯 What Is This?
+## 🎯 What Is FitVerse AI?
 
-**FitVerse AI** is a premium, next-generation fitness & nutrition web application engineered to revolutionize how users train, eat, and track their wellness journey. Combining advanced machine learning via **Google Gemini AI** with an in-house **Retrieval-Augmented Generation (RAG)** knowledge engine, FitVerse AI delivers evidence-based exercise biomechanics, injury safety modifications, macro-calculated nutrition plans, and live voice-guided AI coaching.
+**FitVerse AI** is a premium, next-generation **MERN Stack** fitness & nutrition web application engineered to revolutionize how users train, eat, and track their wellness journey. Combining advanced machine learning via **Google Gemini AI** with an in-house **Retrieval-Augmented Generation (RAG)** knowledge engine, FitVerse AI delivers evidence-based exercise biomechanics, injury safety modifications, macro-calculated nutrition plans, and live voice-guided AI coaching.
 
 The platform features a modern dark-mode **Glassmorphic "Bento Box" UI**, dynamic background gradient orbs, real-time **Socket.IO** push notifications, full **Google OAuth 2.0 + JWT** authentication with Google Password Manager support, an interactive trainer booking module, and an administrative control portal.
 
 ---
 
+## ⚡ MERN Architecture Stack
+
+```text
+                           MERN STACK ARCHITECTURE
+  
+ 🍃 MongoDB Atlas         ⚙️ Express.js           ⚛️ React 18 (Vite)        🟢 Node.js Server
+ └─ Database Layer        └─ REST API Framework    └─ UI Component Shell     └─ Runtime Environment
+    • Users, History         • Auth & JWT Guards      • Tailwind Glassmorphism   • Socket.IO Server
+    • RAG Knowledge Base     • RAG Controller Routing • Speech API Voice Input   • Cron Scheduler
+```
+
+---
+
 ## 🔑 Core Concepts
 
-| Concept | How It Works |
-| :--- | :--- |
-| **RAG Knowledge Engine** | Augments AI prompts with verified scientific articles (bench press form, knee safety, high-protein Indian veg diets, supplement dosage) before querying Gemini LLMs. |
-| **Live Voice Input** | Web Speech API integration allowing users to click 🎙️ and speak voice questions directly to the AI Coach with live speech-to-text transcript updates. |
-| **6-Day AI Workout Generator** | Generates personalized weekly workout splits (Monday–Saturday routines with Sunday recovery) customized to age, experience, equipment, and injuries. |
-| **AI Diet & 1-Click Swap** | Calculates daily target macros (Calories, Protein, Carbs, Fat) and enables 1-click intelligent food alternative swapping with macro matching. |
-| **Real-Time Notifications** | Socket.IO server pushes real-time welcome alerts, streak milestones, and system notifications instantly to connected clients. |
-| **Dual Authentication** | Secure local JWT login + Google OAuth 2.0 with standard HTML5 form attributes (`autoComplete="username"` / `current-password`) for password manager saving. |
-| **Trainer Booking System** | Browse certified fitness trainers, view specialization profiles, select workout slots, and manage active session bookings. |
-| **Glassmorphism UI** | Built with custom Tailwind backdrop filters (`backdrop-blur-2xl`), translucent cards, subtle glow effects, and animated background gradient orbs. |
+| Concept | How It Works | Technical Implementation |
+| :--- | :--- | :--- |
+| **MERN Core Engine** | Full-stack JavaScript architecture connecting MongoDB, Express, React, and Node. | Node.js Express REST API + MongoDB Mongoose + React 18 Client |
+| **RAG Knowledge Engine** | Augments AI prompts with verified scientific articles (bench press form, knee safety, high-protein Indian veg diets, supplement dosage) before querying Gemini LLMs. | MongoDB Text Search + Regex Tag Indexing + Prompt Augmentation |
+| **Live Voice Input** | Web Speech API integration allowing users to click 🎙️ and speak voice questions directly to the AI Coach with live speech-to-text transcript updates. | Web Speech API (`webkitSpeechRecognition`) + Live Input Binding |
+| **6-Day AI Workout Generator** | Generates personalized weekly workout splits (Monday–Saturday routines with Sunday recovery) customized to age, experience, equipment, and injuries. | Fallback LLM Chain (`gemini-flash-latest`, `gemini-3.1-flash-lite`) |
+| **AI Diet & 1-Click Swap** | Calculates daily target macros (Calories, Protein, Carbs, Fat) and enables 1-click intelligent food alternative swapping with macro matching. | Automated Macro Distribution Formula + Food Database Search |
+| **Real-Time Notifications** | Socket.IO server pushes real-time welcome alerts, streak milestones, and system notifications instantly to connected clients. | Socket.IO WebSockets + Node-Cron Background Jobs |
+| **Dual Authentication** | Secure local JWT login + Google OAuth 2.0 with standard HTML5 form attributes (`autoComplete="username"` / `current-password`) for password manager saving. | Passport.js + Bcrypt (10 rounds) + `autoComplete` attributes |
+| **Trainer Booking System** | Browse certified fitness trainers, view specialization profiles, select workout slots, and manage active session bookings. | Express CRUD Controllers + MongoDB Schema Relationships |
+| **Glassmorphism UI** | Built with custom Tailwind backdrop filters (`backdrop-blur-2xl`), translucent cards, subtle glow effects, and animated background gradient orbs. | Tailwind CSS + Custom CSS Variables + Framer Motion |
 
 ---
 
@@ -68,23 +95,20 @@ The platform features a modern dark-mode **Glassmorphic "Bento Box" UI**, dynami
 
 ## 🛠️ Tech Stack
 
-### **Frontend**
-- **Core:** React 18, Vite, JavaScript (ES6+)
+### **MERN Core Stack**
+- **M - MongoDB:** MongoDB Atlas, Mongoose ORM, Text Search Indexing
+- **E - Express.js:** Node.js Web Application Framework, RESTful Routing, Middleware
+- **R - React 18:** Vite Single Page Application, Context API, Hooks, Tailwind Glassmorphism
+- **N - Node.js:** Asynchronous Event-Driven Runtime, Socket.IO WebSockets, Node-Cron Scheduler
+
+### **Supporting Libraries & Tools**
+- **AI Engine:** Google Generative AI (Gemini SDK) + Custom RAG Context Retrieval Engine
 - **Styling:** Tailwind CSS (Vanilla Glassmorphic Utilities, Custom CSS Variables)
 - **State Management:** React Context API (`AuthContext`, `NotificationContext`)
 - **Icons & Motion:** Lucide React, React Icons, Framer Motion
 - **HTTP Client:** Axios with JWT Request/Response Interceptors
-- **Toasts & Feedback:** React Hot Toast
+- **Authentication:** JWT (JSON Web Tokens), Bcrypt.js (10 rounds), Passport.js (Google OAuth 2.0)
 - **Voice Recognition:** Web Speech API (`webkitSpeechRecognition`)
-
-### **Backend**
-- **Runtime:** Node.js, Express.js
-- **Database:** MongoDB Atlas, Mongoose ORM
-- **AI & RAG:** Google Generative AI (Gemini SDK) + Custom RAG Retrieval Engine
-- **Real-Time:** Socket.IO
-- **Authentication:** JWT (JSON Web Tokens), Bcrypt.js, Passport.js (Google OAuth 2.0)
-- **Validation:** Zod Schema Validation
-- **Scheduler:** Node-Cron (Streak resets & welcome alerts)
 
 ---
 
@@ -92,19 +116,19 @@ The platform features a modern dark-mode **Glassmorphic "Bento Box" UI**, dynami
 
 ```text
 FitVerse AI/
-├── 🔧 backend/                                # Express.js REST API & Socket.IO Server
+├── 🔧 backend/                                # Node.js & Express MERN REST API Server
 │   ├── ⚙️ config/
-│   │   ├── db.js                             # MongoDB Mongoose connection client
+│   │   ├── db.js                             # MongoDB Mongoose connection manager
 │   │   └── passport.js                        # Passport.js Google OAuth 2.0 strategy setup
 │   ├── 🎮 controllers/
-│   │   ├── authController.js                  # User register, login, Google OAuth, & welcome notifications
-│   │   ├── dietController.js                  # Diet plan generation & meal management handlers
-│   │   ├── notificationController.js          # User notification retrieval & unread mark handlers
-│   │   ├── trainerController.js               # Trainer directory, profile detail, & booking controllers
-│   │   └── workoutController.js               # Exercise library, history logs, & personal record controllers
+│   │   ├── authController.js                  # User registration, login, Google OAuth, & welcome notifications
+│   │   ├── dietController.js                  # Diet plan generation & meal alternative management
+│   │   ├── notificationController.js          # User notification retrieval & unread mark controllers
+│   │   ├── trainerController.js               # Trainer directory, profile details, & session booking logic
+│   │   └── workoutController.js               # Exercise library, history logging, & PR tracking controllers
 │   ├── 🔒 middleware/
 │   │   ├── admin.js                           # Admin role authorization guard middleware
-│   │   └── auth.js                            # JWT bearer token verification middleware
+│   │   └── auth.js                            # JWT bearer token validation middleware
 │   ├── 📊 models/
 │   │   ├── AIConversation.js                  # AI Coach chat history schema
 │   │   ├── DietPlan.js                        # Master diet plan schema
@@ -112,63 +136,63 @@ FitVerse AI/
 │   │   ├── KnowledgeBase.js                   # RAG scientific articles schema with MongoDB text search index
 │   │   ├── Notification.js                    # User notification schema
 │   │   ├── PersonalRecord.js                  # User PR tracking schema
-│   │   ├── Progress.js                        # User daily body weight, body fat, & heart rate schema
+│   │   ├── Progress.js                        # Daily weight, body fat, & heart rate metrics schema
 │   │   ├── Trainer.js                         # Certified trainer profile schema
 │   │   ├── TrainerBooking.js                  # User trainer booking reservations schema
-│   │   ├── User.js                            # Main user account & credentials schema
-│   │   ├── UserDietPlan.js                    # User customized diet & macro breakdown schema
+│   │   ├── User.js                            # Main user account credentials & profile schema
+│   │   ├── UserDietPlan.js                    # Personalized user diet & macro breakdown schema
 │   │   ├── WorkoutHistory.js                  # Completed workout log schema
 │   │   └── WorkoutPlan.js                     # Generated 6-day split workout routine schema
 │   ├── 🛣️ routes/
-│   │   ├── admin.js                           # Admin management & system analytics endpoints (/api/admin)
-│   │   ├── ai.js                              # AI Coach chat, RAG retrieval, & progress analysis endpoints (/api/ai)
-│   │   ├── auth.js                            # Authentication & user profile endpoints (/api/auth)
-│   │   ├── diet.js                            # Diet plan & food swapping endpoints (/api/diet)
-│   │   ├── notifications.js                   # Real-time notifications endpoints (/api/notifications)
-│   │   ├── trainer.js                         # Trainer browsing & session booking endpoints (/api/trainers)
-│   │   └── workout.js                         # Workout routine & exercise library endpoints (/api/workouts)
-│   ├── 🌱 seeds/
+│   │   ├── admin.js                           # /api/admin endpoints (Analytics & user administration)
+│   │   ├── ai.js                              # /api/ai endpoints (Gemini integration, RAG chat, progress analysis)
+│   │   ├── auth.js                            # /api/auth endpoints (Register, Login, Google OAuth, Profile)
+│   │   ├── diet.js                            # /api/diet endpoints (Meal plans, recipes, food swapping)
+│   │   ├── notifications.js                   # /api/notifications endpoints (Fetch & clear alerts)
+│   │   ├── trainer.js                         # /api/trainers endpoints (Browse trainers & book sessions)
+│   │   └── workout.js                         # /api/workouts endpoints (Routine library & history)
+│   ├── 📁 seeds/
 │   │   ├── dietSeed.js                        # Seeds sample diet plans database
 │   │   ├── fixExerciseImages.js               # Sanitizes and updates exercise thumbnail URLs
-│   │   ├── fixExerciseVideos.js               # Sanitizes and updates exercise demonstration video links
+│   │   ├── fixExerciseVideos.js               # Sanitizes and updates exercise video links
 │   │   ├── fixRecipes.js                      # Clean up recipe dataset entries
 │   │   ├── knowledgeSeed.js                   # Seeds RAG Knowledge Base articles (workout form, nutrition, injuries)
 │   │   ├── seed40Recipes.js                   # Seeds 40+ high-protein recipe items
 │   │   ├── seedExercisesImageFix2.js          # Batch exercise media patch
-│   │   ├── seedMealDB.js                      # Seed external meal data
+│   │   ├── seedMealDB.js                      # Seeds external meal data
 │   │   ├── seedNotifications.js               # Seeds user notification history
 │   │   └── seedTrainers.js                    # Seeds expert trainer profiles
 │   ├── 🛠️ utils/
-│   │   ├── createNotification.js              # Creates DB notification record & emits Socket.IO event
-│   │   ├── cronJobs.js                        # Scheduled tasks for streak resets & notifications
-│   │   ├── ragEngine.js                       # RAG retrieval engine (KnowledgeBase + User Profile -> Augmented Prompt)
+│   │   ├── createNotification.js              # Creates DB notification & emits Socket.IO event
+│   │   ├── cronJobs.js                        # Scheduled background jobs for streak resets & notifications
+│   │   ├── ragEngine.js                       # RAG retrieval engine (KnowledgeBase + User Profile -> Gemini Prompt)
 │   │   └── socket.js                          # Real-time Socket.IO server initialization & client map
-│   ├── .env                                   # Server environment secrets
-│   ├── package.json                           # Backend Node.js dependencies
-│   └── server.js                              # Application entry point (Express app & Socket.IO server)
+│   ├── .env                                   # Backend environment configuration secrets
+│   ├── package.json                           # Backend dependencies & script definitions
+│   └── server.js                              # Node.js server entry point (Express app & Socket.IO listener)
 │
-└── 💻 frontend/                               # React 18 + Vite SPA Client
+└── 📁 frontend/                               # React 18 + Vite MERN SPA Client
     ├── 📁 src/
-    │   ├── 🔌 api/
+    │   ├── 📁 api/
     │   │   └── api.js                         # Axios instance with 401 interceptor & JWT auth header injection
-    │   ├── 🖼️ assets/                          # Static branding images & icons
-    │   ├── 🧩 components/
+    │   ├── 📁 assets/                         # Static local images, logos, & graphics
+    │   ├── 📁 components/
     │   │   ├── 📁 cards/                      # ExerciseCard.jsx, RecipeCard.jsx, StatCard.jsx
     │   │   ├── 📁 common/                     # Navbar.jsx, Footer.jsx, ProtectedRoute.jsx
-    │   │   └── 📁 layout/                     # DashboardLayout.jsx (Glass sidebar, header, & content shell)
-    │   ├── ⚙️ config/                         # Frontend global configuration constants
-    │   ├── 🏪 context/
+    │   │   └── 📁 layout/                     # DashboardLayout.jsx (Sidebar, header, & glass shell)
+    │   ├── 📁 config/                         # Frontend global constants
+    │   ├── 📁 context/
     │   │   ├── AuthContext.jsx                # Global auth state, login, register, Google OAuth setAuthSession, logout
-    │   │   └── NotificationContext.jsx        # Real-time Socket.IO notification listener & unread counter
-    │   ├── 📄 pages/
+    │   │   └── NotificationContext.jsx        # Real-time Socket.IO notification listener & unread count
+    │   ├── 📁 pages/
     │   │   ├── 📁 Admin/                      # AdminDashboard.jsx (System metrics & user management)
     │   │   ├── 📁 Auth/                       # ForgotPasswordPage.jsx, ResetPasswordPage.jsx
-    │   │   ├── 📁 Dashboard/                  # Member dashboard views
+    │   │   ├── 📁 Dashboard/                  # Dashboard sub-views
     │   │   │   ├── AIPage.jsx                 # Glassmorphic AI Coach chat with RAG & Voice Mic Input
-    │   │   │   ├── DashboardPage.jsx          # Main member dashboard with dynamic metrics & activity feed
+    │   │   │   ├── DashboardPage.jsx          # Main user dashboard with dynamic metrics & activity feed
     │   │   │   ├── NotificationsPage.jsx       # Full user notification history view
     │   │   │   ├── NutritionCenter.jsx        # Recipe finder & 1-click meal swap center
-    │   │   │   ├── ProfilePage.jsx            # User body metrics & account settings
+    │   │   │   ├── ProfilePage.jsx            # User physical metrics & account settings
     │   │   │   ├── ProgressPage.jsx           # Weight, body fat, & heart rate analytics charts
     │   │   │   └── 📁 Trainer/                # BrowseTrainers.jsx, TrainerHome.jsx, TrainerProfile.jsx
     │   │   ├── 📁 Diet/                       # DietPage.jsx (Public diet overview & macro tools)
@@ -181,290 +205,121 @@ FitVerse AI/
     │   ├── App.jsx                            # React Router component tree & global background orbs
     │   └── main.jsx                           # React DOM root entry point
     ├── index.html                             # Single Page Application HTML template
-    ├── package.json                           # Frontend Node.js dependencies
+    ├── package.json                           # Frontend dependencies
     └── vite.config.js                         # Vite bundler configuration
 ```
 
 ---
 
-## 🏗️ Architecture Overview
-
-```text
-  ┌────────────────────────────────────────────────────────────────────────┐
-  │                           React 18 Frontend                            │
-  │     (Vite + Tailwind CSS Glassmorphism + Web Speech API + Axios)       │
-  └───────────────────┬────────────────────────────────┬───────────────────┘
-                      │                                │
-             HTTP REST Calls (JWT)             Socket.IO Real-Time Events
-                      │                                │
-                      ▼                                ▼
-  ┌────────────────────────────────────────────────────────────────────────┐
-  │                         Node.js / Express API                          │
-  │             (Controllers + JWT Middleware + Passport Auth)             │
-  └───────────────────┬────────────────────────────────────────────────────┘
-                      │
-           ┌──────────┴──────────────────────────┐
-           ▼                                     ▼
-┌──────────────────────┐              ┌──────────────────────┐
-│  MongoDB Atlas DB    │              │  RAG Engine & Gemini │
-│  (Users, Workouts,   │              │  (Knowledge Base +   │
-│   RAG Knowledge)     │              │   User Profile Context)
-└──────────────────────┘              └──────────────────────┘
-```
-
-### Key Architectural Highlights:
-1. **RESTful API with Role Guards:** All protected routes utilize the `protect` middleware to verify Bearer JWT tokens, and sensitive administrative endpoints enforce `admin` role checks.
-2. **Retrieval-Augmented Generation (RAG):** User query keywords trigger a MongoDB text/regex search against the `KnowledgeBase` collection. Matching articles are combined with the user's active health metrics to construct an augmented prompt sent to Gemini AI.
-3. **Fallback Model Resilience:** Google Gemini SDK incorporates automatic fallback across models (`gemini-flash-latest`, `gemini-3.1-flash-lite`, `gemini-3.5-flash`) ensuring 99.9% uptime.
-4. **Socket.IO Real-Time Communications:** Connected clients authenticate socket handshake IDs, allowing backend controllers to push notifications directly to specific user sockets in real time.
-
----
-
-## 🚀 End-to-End Setup
+## 🚀 End-to-End Setup Guide
 
 ### 📋 Prerequisites
-- **Node.js:** v18.0.0+
-- **MongoDB:** MongoDB Atlas connection string or local MongoDB instance
-- **npm:** v8.0.0+
+- **Node.js:** v18.0.0 or higher
+- **MongoDB:** MongoDB Atlas connection URI or local MongoDB instance
+- **npm:** v8.0.0 or higher
 
 ---
 
-### ⚙️ Backend Setup
+### ⚙️ 1. Backend Installation & Setup
 
-1. **Navigate to the backend directory & install dependencies:**
-   ```bash
-   cd backend
-   npm install
-   ```
-
-2. **Create a `.env` file in `backend/.env`:**
-   ```env
-   PORT=5000
-   NODE_ENV=development
-   MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/fitverse
-   JWT_SECRET=your_super_secret_jwt_key_here_min_32_chars
-   GEMINI_API_KEY=your_google_gemini_api_key_here
-   GOOGLE_CLIENT_ID=your_google_oauth_client_id
-   GOOGLE_CLIENT_SECRET=your_google_oauth_client_secret
-   FRONTEND_URL=http://localhost:5173
-   ```
-
-3. **Seed the RAG Knowledge Base & Database Content:**
-   ```bash
-   node seeds/knowledgeSeed.js
-   node seeds/dietSeed.js
-   node seeds/seedTrainers.js
-   ```
-
-4. **Start the backend server:**
-   ```bash
-   node server.js
-   ```
-
-   *Expected Output:*
-   ```text
-   ⏳ Notification Cron Jobs Initialized
-   🚀 FitVerse Server running on http://localhost:5000
-   📊 Environment: development
-   ✅ MongoDB Connected
-   ```
-
----
-
-### 💻 Frontend Setup
-
-1. **Navigate to the frontend directory & install dependencies:**
-   ```bash
-   cd frontend
-   npm install
-   ```
-
-2. **Start the Vite development server:**
-   ```bash
-   npm run dev
-   ```
-
-3. **Open your browser:**
-   Navigating to `http://localhost:5173` will display the FitVerse AI landing page!
-
----
-
-## 🎯 API Endpoints
-
-### 🔐 Authentication (`/api/auth`)
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `POST` | `/api/auth/register` | Register new user account + receive JWT |
-| `POST` | `/api/auth/login` | Authenticate existing credentials + receive JWT |
-| `GET` | `/api/auth/google` | Trigger Google OAuth 2.0 authentication flow |
-| `GET` | `/api/auth/me` | Fetch authenticated user profile details |
-| `PUT` | `/api/auth/profile` | Update physical stats (height, weight, age, goal) |
-
-### 🧠 AI & RAG Engine (`/api/ai`)
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `POST` | `/api/ai/chat` | Send question to RAG AI Coach (retrieves KnowledgeBase + context) |
-| `POST` | `/api/ai/generate-workout` | Generate 6-day split personalized weekly workout routine |
-| `POST` | `/api/ai/generate-diet` | Generate macro-calculated daily diet plan |
-| `POST` | `/api/ai/diet-chat` | Chat with AI Dietitian for meal swaps |
-| `POST` | `/api/ai/progress-analysis` | Generate AI-driven progress report from recent weight logs |
-| `DELETE`| `/api/ai/chat-history` | Clear AI Coach chat conversation history |
-
-### 🏋️ Workouts & Exercises (`/api/workouts`)
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/workouts/library` | Get list of all exercise items with video/image URLs |
-| `GET` | `/api/workouts/active-plan` | Fetch user's active 6-day workout routine |
-| `POST` | `/api/workouts/history` | Log a completed workout session |
-| `GET` | `/api/workouts/prs` | Get user's Personal Records (PRs) |
-
-### 🥗 Diets & Recipes (`/api/diet`)
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/diet/my-plan` | Get active user diet plan with daily macros |
-| `POST` | `/api/diet/swap-food` | Perform 1-click food alternative swap in diet plan |
-| `GET` | `/api/diet/recipes` | Search high-protein recipe database |
-
-### 🧑‍🏫 Trainers (`/api/trainers`)
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/trainers` | Browse certified trainers directory |
-| `GET` | `/api/trainers/:id` | View specific trainer profile & credentials |
-| `POST` | `/api/trainers/book` | Book a personal training session |
-
-### 🔔 Notifications (`/api/notifications`)
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/notifications` | Fetch user notification history |
-| `PATCH`| `/api/notifications/:id/read` | Mark notification as read |
-| `DELETE`| `/api/notifications/clear` | Clear all user notifications |
-
----
-
-## 💳 AI Coaching & Diet Flow
-
-```text
-User asks question via Text or Voice (🎙️)
-                  │
-                  ▼
-   POST /api/ai/chat { message }
-                  │
-                  ▼
-   RAG Engine searches KnowledgeBase collection
-   (Matches terms against text index & tags)
-                  │
-                  ▼
-   Fetches User Profile (Height, Weight, Goal, Recent Logs)
-                  │
-                  ▼
-   Constructs RAG Augmented Prompt -> Passes to Gemini AI
-                  │
-                  ▼
-   Returns structured response + retrievedDocs metadata
-                  │
-                  ▼
-   Frontend displays response in glass card with ⚡ RAG Active badge
-```
-
----
-
-## 📊 Admin Management Portal
-
-The administrative dashboard (`/admin`) provides system overview and control:
-- 📈 **KPI Cards:** Platform users count, generated workout routines, diet plans, and trainer bookings.
-- 👥 **User Control:** View registered members, modify role privileges (`user` vs `admin`), and inspect account activity.
-- 🏋️ **Library Management:** Manage exercise database entries, thumbnail media, and recipe catalogs.
-
----
-
-## 📜 Scripts
-
-### Backend (`/backend`)
 ```bash
-node server.js             # Start the Express & Socket.IO server
-node seeds/knowledgeSeed.js# Seed RAG Knowledge Base articles into MongoDB
-node seeds/dietSeed.js     # Seed initial diet plans database
-node seeds/seedTrainers.js # Seed certified trainer profiles
+# Navigate into backend
+cd backend
+
+# Install node packages
+npm install
 ```
 
-### Frontend (`/frontend`)
+Create a `.env` configuration file inside `backend/.env`:
+
+```env
+PORT=5000
+NODE_ENV=development
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/fitverse
+JWT_SECRET=your_super_secret_jwt_key_here_min_32_chars
+GEMINI_API_KEY=your_google_gemini_api_key_here
+GOOGLE_CLIENT_ID=your_google_oauth_client_id
+GOOGLE_CLIENT_SECRET=your_google_oauth_client_secret
+FRONTEND_URL=http://localhost:5173
+```
+
+Seed the database with verified RAG articles, recipes, and trainer profiles:
+
 ```bash
-npm run dev                # Start Vite development server (http://localhost:5173)
-npm run build              # Execute production build (Outputs to dist/)
-npm run preview            # Preview production build locally
+node seeds/knowledgeSeed.js
+node seeds/dietSeed.js
+node seeds/seedTrainers.js
+```
+
+Start the backend server:
+
+```bash
+node server.js
 ```
 
 ---
 
-## 🐛 Troubleshooting
+### 💻 2. Frontend Installation & Setup
 
-| Error | Solution |
-| :--- | :--- |
-| **❌ MongoDB Connection Error** | Ensure your IP address is whitelisted in MongoDB Atlas Network Access and your `MONGODB_URI` string in `.env` is correct. |
-| **❌ 401 Unauthorized Error** | Verify your JWT token exists in `localStorage` under `fitverse_token`. Log out and log back in to refresh token. |
-| **❌ Mic "no-speech" Warning** | Speak clearly after clicking the microphone icon 🎙️. If browser blocks mic, click the Lock icon in the URL bar and grant Microphone permission. |
-| **❌ Gemini API Key Missing** | Ensure `GEMINI_API_KEY` is present in `backend/.env` without quotes. |
+```bash
+# Open a new terminal and navigate to frontend
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start Vite dev server
+npm run dev
+```
+
+Open your browser at `http://localhost:5173` to explore the live MERN application!
 
 ---
 
-## 🔒 Security
+## 🎯 API Reference
 
-- ✅ **JWT Protection:** All sensitive routes require a valid Bearer JWT token validated by `authMiddleware`.
-- ✅ **Password Hashing:** Passwords auto-hashed via Bcrypt.js (10 salt rounds) before saving to MongoDB.
-- ✅ **Role Guards:** `admin` middleware enforces strict access control on administrative endpoints.
-- ✅ **Input Sanitization:** HTML5 form attributes (`autoComplete="username"` / `current-password`) provide standard password manager integration without exposing plain-text credentials.
+### 🔐 Auth Routes (`/api/auth`)
+| HTTP Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/register` | Register new user account & return JWT | No |
+| `POST` | `/api/auth/login` | Authenticate credentials & return JWT | No |
+| `GET` | `/api/auth/google` | Trigger Google OAuth 2.0 flow | No |
+| `GET` | `/api/auth/me` | Get active user profile data | Yes |
+| `PUT` | `/api/auth/profile` | Update height, weight, goal, and metrics | Yes |
+
+### 🧠 AI & RAG Routes (`/api/ai`)
+| HTTP Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/ai/chat` | Query RAG AI Coach (Retrieves articles + context) | Yes |
+| `POST` | `/api/ai/generate-workout` | Generate 6-day split workout routine | Yes |
+| `POST` | `/api/ai/generate-diet` | Generate daily macro diet plan | Yes |
+| `POST` | `/api/ai/progress-analysis` | Generate AI-driven progress report | Yes |
+| `DELETE`| `/api/ai/chat-history` | Clear AI chat conversation logs | Yes |
+
+---
+
+## 🔒 Security & Best Practices
+
+- ✅ **JWT Verification:** All protected routes verify Bearer JWT tokens in `authMiddleware`.
+- ✅ **Bcrypt Password Hashing:** User passwords are auto-hashed with 10 salt rounds before database persistence.
+- ✅ **Admin Route Guards:** Administrative actions enforce `adminOnly` role validation.
+- ✅ **Google Password Manager Ready:** Login form utilizes standard `autoComplete="username"` and `autoComplete="current-password"` attributes.
 - ✅ **CORS Protection:** Configured CORS origins restriction linked to `FRONTEND_URL`.
-
----
-
-## 🗺️ Roadmap
-
-### Phase 1 (Completed) ✅
--  RAG Engine & Knowledge Base integration for AI Coach
--  Live Voice Input (Speech-to-Text) using Web Speech API
--  6-Day Split AI Workout Generator
--  AI Diet & 1-Click Food Swapper
--  Socket.IO Real-Time Welcome & System Notifications
--  Google OAuth 2.0 + JWT authentication
--  Trainer browsing & booking system
--  Glassmorphic Bento UI with animated gradient background orbs
--  Admin management portal
-
-### Phase 2 (Planned) 🔄
-- 📱 Mobile App (React Native / PWA)
-- ⌚ Wearable Device Integration (Apple HealthKit & Google Fit API)
-- 📊 Advanced Chart Analytics for Workout Volume
-- 🏆 Community Leaderboards & Challenges
-
----
-
-## 🤝 Contributing
-
-1. 🍴 **Fork the Repository:** `git clone https://github.com/prathameshpimpale07-byte/Fitverse.git`
-2. 🌿 **Create a Feature Branch:** `git checkout -b feature/amazing-feature`
-3. 💻 **Commit Your Changes:** `git commit -m 'Add amazing feature'`
-4. 📤 **Push to Branch:** `git push origin feature/amazing-feature`
-5. 🔀 **Open a Pull Request**
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License — see the LICENSE file for details.
+Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
 ## 📧 Contact & Support
 
-Need help or have questions regarding FitVerse AI?
-
 - 📧 **Email:** [prathameshpimpale07@gmail.com](mailto:prathameshpimpale07@gmail.com)
 - 💼 **LinkedIn:** [Prathmesh Pimpale](https://linkedin.com)
 - 🐙 **GitHub:** [@prathameshpimpale07-byte](https://github.com/prathameshpimpale07-byte)
 
-*Found this project helpful? Give it a ⭐ on GitHub!*
-
----
-
-> **FitVerse AI — Where Science Meets Fitness.**  
-> Made with ❤️ and ☕
+<p align="center">
+  Made with ❤️ & ☕ by <b>Prathmesh Pimpale</b>
+</p>
