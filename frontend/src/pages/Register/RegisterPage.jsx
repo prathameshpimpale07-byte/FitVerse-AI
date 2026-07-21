@@ -390,14 +390,14 @@ const RegisterPage = () => {
                   <div className="relative px-4 text-slate-400 text-xs font-bold uppercase tracking-wider bg-white">Or continue with</div>
                 </div>
 
-                <div className="mt-8 flex justify-center">
+                <div className="mt-8 flex justify-center w-full">
                   <GoogleLogin
                     onSuccess={handleGoogleSuccess}
                     onError={handleGoogleError}
-                    useOneTap
+                    useOneTap={false}
+                    theme="outline"
                     shape="pill"
                     size="large"
-                    width="300"
                     text="signup_with"
                   />
                 </div>

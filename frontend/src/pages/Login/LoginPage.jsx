@@ -189,14 +189,15 @@ const LoginPage = () => {
             </div>
 
             {/* Google Button */}
-            <div className="mt-8 flex justify-center">
+            <div className="mt-8 flex justify-center w-full">
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
                 onError={handleGoogleError}
-                useOneTap
-                shape="pill"
+                useOneTap={false}
+                theme="outline"
                 size="large"
-                width="300"
+                text="signin_with"
+                shape="pill"
               />
             </div>
 

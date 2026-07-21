@@ -108,10 +108,16 @@ var generateToken = (id) => {
           return res.status(400).json({ success: false, message: 'No Google token provided' });
         }
 
-        // Verify the token
+        // Verify the token with allowed client IDs
+        const allowedClientIds = [
+          process.env.GOOGLE_CLIENT_ID,
+          '65460293350-81bn2cd3kjde7dnqsrtcqpfhcd2k67gk.apps.googleusercontent.com',
+          '65460293350-m76sjjtl647l4sk4vm3dq1ibuu4tj6m3.apps.googleusercontent.com'
+        ].filter(Boolean);
+
         const ticket = await client.verifyIdToken({
             idToken: token,
-            audience: process.env.GOOGLE_CLIENT_ID,
+            audience: allowedClientIds,
         });
         const payload = ticket.getPayload();
         const { email, name, picture: avatar } = payload;
