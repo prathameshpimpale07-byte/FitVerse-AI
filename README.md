@@ -22,8 +22,8 @@
 
 | Resource | Platform | Link |
 | :--- | :--- | :--- |
-| 🌐 **Frontend** | Vercel | [View Live Site →](https://fitverse-ai.vercel.app) |
-| ⚙️ **Backend** | Render | [API Server →](https://fitverse-ai-backend.onrender.com) |
+| 🌐 **Frontend** | Vercel | [View Live Site →](https://fit-verse-ai-07.vercel.app/) |
+| ⚙️ **Backend** | Render | [API Server →](https://fitverse-ai-2.onrender.com) |
 | 📖 **API Docs** | Postman | [Documentation →](https://documenter.getpostman.com/view/fitverse-ai) |
 | ▶️ **Demo Video** | YouTube | [Watch on YouTube →](https://youtube.com) |
 
@@ -317,7 +317,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ## 📧 Contact & Support
 
 - 📧 **Email:** [prathameshpimpale07@gmail.com](mailto:prathameshpimpale07@gmail.com)
-- 💼 **LinkedIn:** [Prathmesh Pimpale](https://linkedin.com)
+- 💼 **LinkedIn:** [Prathmesh Pimpale](https://www.linkedin.com/in/prathamesh-pimpale-0b079a378/)
 - 🐙 **GitHub:** [@prathameshpimpale07-byte](https://github.com/prathameshpimpale07-byte)
 
 <p align="center">
