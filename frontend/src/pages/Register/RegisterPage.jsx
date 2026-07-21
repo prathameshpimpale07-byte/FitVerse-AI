@@ -43,6 +43,77 @@ const RegisterPage = () => {
     }
   });
 
+  const pwd = watch('password') || '';
+  const formData = watch();
+
+  const getStrength = (p) => {
+    let s = 0;
+    if (p.length > 5) s += 1;
+    if (p.length > 8) s += 1;
+    if (/[A-Z]/.test(p)) s += 1;
+    if (/[0-9]/.test(p)) s += 1;
+    if (/[^A-Za-z0-9]/.test(p)) s += 1;
+    return s;
+  };
+  const strength = getStrength(pwd);
+  const strengthColor = strength <= 2 ? 'bg-red-500' : strength <= 3 ? 'bg-yellow-500' : 'bg-emerald-500';
+
+  const nextStep = async () => {
+    let valid = false;
+    if (step === 1) {
+      valid = await trigger(['name', 'email', 'phone', 'password', 'confirmPassword', 'terms']);
+    } else if (step === 2) {
+      valid = await trigger(['age', 'height', 'weight']);
+    } else if (step === 3) {
+      valid = true;
+    }
+    
+    if (valid) setStep((prev) => Math.min(prev + 1, totalSteps));
+  };
+
+  const prevStep = () => {
+    setStep((prev) => Math.max(prev - 1, 1));
+  };
+
+  const onSubmit = async (data) => {
+    setLoading(true);
+    try {
+      await authRegister(data);
+      navigate('/dashboard');
+    } catch (err) {
+      toast.error(err?.message || 'Registration failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://fitverse-ai-2.onrender.com/api';
+      const res = await fetch(`${apiUrl}/auth/google`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: credentialResponse.credential }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAuthSession(data.user, data.token);
+        toast.success(`Welcome to FitVerse, ${data.user.name}! 🚀`);
+        navigate('/dashboard');
+      } else {
+        toast.error(data.message || 'Google Signup failed');
+      }
+    } catch (err) {
+      toast.error('Network error during Google Signup');
+    }
+  };
+
+  const handleGoogleError = () => {
+    toast.error('Google Signup failed');
+  };
+
   return (
     <div className="min-h-screen flex bg-transparent font-sans overflow-hidden">
       
