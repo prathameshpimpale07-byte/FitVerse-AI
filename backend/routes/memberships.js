@@ -1,0 +1,12 @@
+var express2 = require("express");
+    var router = express2.Router();
+    var { getMemberships, getMembership, createMembership, updateMembership, deleteMembership, purchaseMembership } = require('../controllers/membershipController.js');
+    var { protect } = require('../middleware/auth.js');
+    var { admin } = require('../middleware/admin.js');
+    router.get("/", getMemberships);
+    router.get("/:id", getMembership);
+    router.post("/", protect, admin, createMembership);
+    router.put("/:id", protect, admin, updateMembership);
+    router.delete("/:id", protect, admin, deleteMembership);
+    router.post("/:id/purchase", protect, purchaseMembership);
+    module.exports = router;

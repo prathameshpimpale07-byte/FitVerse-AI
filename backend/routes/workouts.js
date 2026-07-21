@@ -1,0 +1,11 @@
+var express2 = require("express");
+    var router = express2.Router();
+    var { getWorkouts, getWorkout, createWorkout, updateWorkout, deleteWorkout } = require('../controllers/workoutController.js');
+    var { protect } = require('../middleware/auth.js');
+    var { admin } = require('../middleware/admin.js');
+    router.get("/", getWorkouts);
+    router.get("/:id", getWorkout);
+    router.post("/", protect, admin, createWorkout);
+    router.put("/:id", protect, admin, updateWorkout);
+    router.delete("/:id", protect, admin, deleteWorkout);
+    module.exports = router;

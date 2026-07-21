@@ -1,0 +1,11 @@
+var express2 = require("express");
+    var router = express2.Router();
+    var { getUsers, getUser, updateProfile, deleteUser, markNotification } = require('../controllers/userController.js');
+    var { protect } = require('../middleware/auth.js');
+    var { admin } = require('../middleware/admin.js');
+    router.get("/", protect, admin, getUsers);
+    router.get("/:id", protect, getUser);
+    router.put("/profile", protect, updateProfile);
+    router.delete("/:id", protect, admin, deleteUser);
+    router.put("/notifications/:notifId", protect, markNotification);
+    module.exports = router;
