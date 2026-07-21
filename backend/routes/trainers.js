@@ -1,0 +1,15 @@
+var express2 = require("express");
+    var router = express2.Router();
+    var { getTrainers, getTrainer, createTrainer, updateTrainer, deleteTrainer, createBooking, getMyBookings, updateBooking, deleteBooking } = require('../controllers/trainerController.js');
+    var { protect } = require('../middleware/auth.js');
+    var { admin } = require('../middleware/admin.js');
+    router.get("/", getTrainers);
+    router.get("/:id", getTrainer);
+    router.post("/", protect, admin, createTrainer);
+    router.put("/:id", protect, admin, updateTrainer);
+    router.delete("/:id", protect, admin, deleteTrainer);
+    router.post("/bookings", protect, createBooking);
+    router.get("/bookings/my", protect, getMyBookings);
+    router.put("/bookings/:id", protect, updateBooking);
+    router.delete("/bookings/:id", protect, deleteBooking);
+    module.exports = router;
