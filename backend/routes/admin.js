@@ -1,0 +1,14 @@
+var express2 = require("express");
+    var router = express2.Router();
+    var { getAnalytics, getContacts, submitContact, updateContact, getBlogs, createBlog, updateBlog, deleteBlog } = require('../controllers/adminController.js');
+    var { protect } = require('../middleware/auth.js');
+    var { admin } = require('../middleware/admin.js');
+    router.get("/analytics", protect, admin, getAnalytics);
+    router.get("/contacts", protect, admin, getContacts);
+    router.post("/contacts", submitContact);
+    router.put("/contacts/:id", protect, admin, updateContact);
+    router.get("/blogs", getBlogs);
+    router.post("/blogs", protect, admin, createBlog);
+    router.put("/blogs/:id", protect, admin, updateBlog);
+    router.delete("/blogs/:id", protect, admin, deleteBlog);
+    module.exports = router;
