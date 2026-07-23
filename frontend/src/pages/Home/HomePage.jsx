@@ -895,7 +895,7 @@ const HomePage = () => {
                   </button>
                   {contactStatus === 'success' && (
                     <div className="text-center mt-6 p-4 bg-green-500/20 border border-green-500/30 rounded-xl">
-                      <p className="text-green-400 font-bold">Message sent successfully! We'll get back to you soon.</p>
+                      <p className="text-green-400 font-bold">Message sent successfully!</p>
                     </div>
                   )}
                   {contactStatus === 'error' && (
