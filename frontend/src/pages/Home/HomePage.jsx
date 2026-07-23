@@ -5,6 +5,7 @@ import {
   FaArrowRight, FaRobot, FaDumbbell, FaChartLine, FaCheckCircle, 
   FaAppleAlt, FaPlay, FaFire, FaStar, FaChartPie, FaChevronDown, FaEnvelope 
 } from 'react-icons/fa';
+import api from '../../services/api';
 
 const HomePage = () => {
   const [activeFaq, setActiveFaq] = useState(null);
@@ -15,14 +16,8 @@ const HomePage = () => {
     e.preventDefault();
     setContactStatus('sending');
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://fitverse-ai-2.onrender.com/api';
-      const response = await fetch(`${apiUrl}/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(contactForm)
-      });
-      const data = await response.json();
-      if (data.success) {
+      const data = await api.post('/contact', contactForm);
+      if (data && data.success) {
         setContactStatus('success');
         setContactForm({ firstName: '', lastName: '', email: '', message: '' });
         setTimeout(() => setContactStatus(null), 5000); 
@@ -30,6 +25,7 @@ const HomePage = () => {
         setContactStatus('error');
       }
     } catch (err) {
+      console.error('Contact form submission error:', err);
       setContactStatus('error');
     }
   };

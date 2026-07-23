@@ -72,3 +72,7 @@ export const dashboardService = {
 export const exerciseService = {
   getAll: (category) => api.get('/exercises', { params: { category } }),
 };
+
+export const contactService = {
+  submit: (data) => api.post('/contact', data),
+};
