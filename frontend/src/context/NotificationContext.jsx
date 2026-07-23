@@ -6,7 +6,17 @@ import api from '../services/api';
 
 const NotificationContext = createContext(null);
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'https://fitverse-ai-2.onrender.com';
+const getSocketUrl = () => {
+  const envUrl = import.meta.env.VITE_SOCKET_URL;
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    if (!envUrl || envUrl.includes('onrender.com')) {
+      return 'http://localhost:5000';
+    }
+  }
+  return envUrl || 'https://fitverse-ai-2.onrender.com';
+};
+
+const SOCKET_URL = getSocketUrl();
 
 // ── Category emoji map ───────────────────────────────────────────────────────
 const CATEGORY_EMOJI = {

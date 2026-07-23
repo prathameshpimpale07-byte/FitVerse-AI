@@ -1,16 +1,24 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://fitverse-ai-2.onrender.com/api';
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return 'http://localhost:5000/api';
+  }
+  return import.meta.env.VITE_API_URL || 'https://fitverse-ai-2.onrender.com/api';
+};
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: getBaseUrl(),
   headers: { 'Content-Type': 'application/json' },
   timeout: 15000,
 });
 
-// Request interceptor — attach token
+// Request interceptor — attach token & enforce local backend on localhost
 api.interceptors.request.use(
   (config) => {
+    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      config.baseURL = 'http://localhost:5000/api';
+    }
     const token = localStorage.getItem('fitverse_token');
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;

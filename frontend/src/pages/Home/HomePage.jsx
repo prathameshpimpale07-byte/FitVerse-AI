@@ -11,10 +11,20 @@ const HomePage = () => {
   const [activeFaq, setActiveFaq] = useState(null);
   const [contactForm, setContactForm] = useState({ firstName: '', lastName: '', email: '', message: '' });
   const [contactStatus, setContactStatus] = useState(null);
+  const [contactErrorMessage, setContactErrorMessage] = useState('');
 
   const handleContactSubmit = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
+    
+    if (!contactForm.firstName.trim() || !contactForm.email.trim() || !contactForm.message.trim()) {
+      setContactStatus('error');
+      setContactErrorMessage('Please fill in all required fields (First Name, Email, and Message).');
+      return;
+    }
+
     setContactStatus('sending');
+    setContactErrorMessage('');
+
     try {
       const data = await api.post('/contact', contactForm);
       if (data && data.success) {
@@ -23,10 +33,12 @@ const HomePage = () => {
         setTimeout(() => setContactStatus(null), 5000); 
       } else {
         setContactStatus('error');
+        setContactErrorMessage(data?.error || data?.message || 'Failed to send message.');
       }
     } catch (err) {
       console.error('Contact form submission error:', err);
       setContactStatus('error');
+      setContactErrorMessage(err?.error || err?.message || 'Server connection error. Please try again.');
     }
   };
 
@@ -863,7 +875,20 @@ const HomePage = () => {
                   </div>
                   <div className="mb-8">
                     <label className="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-widest">Message</label>
-                    <textarea required rows="4" value={contactForm.message} onChange={(e) => setContactForm({...contactForm, message: e.target.value})} className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 text-white outline-none transition-all resize-none font-medium placeholder:text-slate-600 shadow-inner" placeholder="How can we help you achieve your goals?" />
+                    <textarea 
+                      required 
+                      rows="4" 
+                      value={contactForm.message} 
+                      onChange={(e) => setContactForm({...contactForm, message: e.target.value})} 
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleContactSubmit(e);
+                        }
+                      }}
+                      className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 text-white outline-none transition-all resize-none font-medium placeholder:text-slate-600 shadow-inner" 
+                      placeholder="How can we help you achieve your goals? (Press Enter to send)" 
+                    />
                   </div>
                   <button type="submit" disabled={contactStatus === 'sending'} className="w-full py-4 bg-white text-slate-900 hover:bg-primary-500 hover:text-white font-black rounded-2xl transition-all shadow-lg text-lg hover:-translate-y-1 hover:shadow-primary-500/25 disabled:opacity-70 disabled:cursor-not-allowed">
                     {contactStatus === 'sending' ? 'Sending...' : 'Send Message'}
@@ -873,7 +898,11 @@ const HomePage = () => {
                       <p className="text-green-400 font-bold">Message sent successfully! We'll get back to you soon.</p>
                     </div>
                   )}
-                  {contactStatus === 'error' && <p className="text-red-400 font-bold text-center mt-4">Failed to send message. Please try again.</p>}
+                  {contactStatus === 'error' && (
+                    <div className="text-center mt-6 p-4 bg-red-500/20 border border-red-500/30 rounded-xl">
+                      <p className="text-red-400 font-bold">{contactErrorMessage || 'Failed to send message. Please try again.'}</p>
+                    </div>
+                  )}
                 </form>
               </motion.div>
             </div>
