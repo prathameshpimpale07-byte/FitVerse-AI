@@ -156,6 +156,7 @@ const DietPage = () => {
     { id: 'home',      label: 'Diet Home', icon: <FaAppleAlt /> },
     { id: 'generator', label: 'AI Planner', icon: <FaPlus /> },
     { id: 'recipes',   label: 'Recipes',   icon: <FaUtensils /> },
+    { id: 'water',     label: 'Water',     icon: <FaTint /> },
     { id: 'dashboard', label: 'Analytics', icon: <FaChartBar /> },
     { id: 'grocery',   label: 'Groceries', icon: <FaShoppingCart /> },
   ];
@@ -232,14 +233,19 @@ const DietPage = () => {
                       </button>
                     </div>
                   ) : (
-                    <div className="space-y-6">
-                      <MyDietPlan 
-                        plan={plan}
-                        activeDay={activeDay}
-                        setActiveDay={setActiveDay}
-                        onRegenerate={() => setActiveTab('generator')}
-                        onMealLogged={handleLogUpdate}
-                      />
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      <div className="lg:col-span-2 space-y-6">
+                        <MyDietPlan 
+                          plan={plan}
+                          activeDay={activeDay}
+                          setActiveDay={setActiveDay}
+                          onRegenerate={() => setActiveTab('generator')}
+                          onMealLogged={handleLogUpdate}
+                        />
+                      </div>
+                      <div className="space-y-6">
+                        <WaterTracker plan={plan} onWaterLogged={handleLogUpdate} />
+                      </div>
                     </div>
                   )}
                 </>
