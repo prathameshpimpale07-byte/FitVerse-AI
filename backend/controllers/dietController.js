@@ -21,10 +21,10 @@ exports.resetMyPlan = async (req, res, next) => {
   }
 };
 
-// 3. Toggle Meal Completion for a specific date
+// 3. Toggle Meal Completion for a specific date and dayNumber
 exports.completeMeal = async (req, res, next) => {
   try {
-    const { date, meal, status } = req.body; // status: 'Completed', 'Pending', 'Missed'
+    const { date, meal, status, dayNumber } = req.body; // status: 'Completed', 'Pending', 'Missed'
     if (!date || !meal || !status) {
       return res.status(400).json({ success: false, message: "Date, meal type, and status are required." });
     }
@@ -34,16 +34,41 @@ exports.completeMeal = async (req, res, next) => {
       return res.status(404).json({ success: false, message: "No active diet plan found. Please generate one first." });
     }
 
-    // Check if log already exists for this date and meal
-    const logIndex = plan.completedMealsLog.findIndex(log => log.date === date && log.meal === meal);
+    const activeDayNum = Number(dayNumber) || 1;
+    // Check if log already exists for this date, meal, and dayNumber
+    const logIndex = plan.completedMealsLog.findIndex(
+      log => log.date === date && log.meal === meal && (log.dayNumber || 1) === activeDayNum
+    );
     if (logIndex > -1) {
       plan.completedMealsLog[logIndex].status = status;
+      plan.completedMealsLog[logIndex].dayNumber = activeDayNum;
     } else {
-      plan.completedMealsLog.push({ date, meal, status });
+      plan.completedMealsLog.push({ date, meal, status, dayNumber: activeDayNum });
     }
 
     await plan.save();
     res.json({ success: true, message: `Meal ${meal} marked as ${status}.`, plan });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Reset logs for a specific day and date
+exports.resetDayProgress = async (req, res, next) => {
+  try {
+    const { date, dayNumber } = req.body;
+    let plan = await UserDietPlan.findOne({ userId: req.user._id });
+    if (!plan) {
+      return res.status(404).json({ success: false, message: "No active diet plan found." });
+    }
+
+    const activeDayNum = Number(dayNumber) || 1;
+    plan.completedMealsLog = plan.completedMealsLog.filter(
+      log => !(log.date === date && (log.dayNumber || 1) === activeDayNum)
+    );
+
+    await plan.save();
+    res.json({ success: true, message: `Day ${activeDayNum} progress reset.`, plan });
   } catch (error) {
     next(error);
   }

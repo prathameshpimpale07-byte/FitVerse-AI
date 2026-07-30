@@ -20,14 +20,39 @@ const DietPage = () => {
   const [loading, setLoading] = useState(true);
   const [showResetModal, setShowResetModal] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [activeDay, setActiveDay] = useState(1);
 
   const fetchPlan = async () => {
+    // Instant cache load from localStorage so no flicering occurs on section switch
+    const cached = localStorage.getItem('fitverse_active_diet_plan');
+    if (cached) {
+      try {
+        const parsedCache = JSON.parse(cached);
+        if (parsedCache && (parsedCache.meals?.length > 0 || parsedCache.dailyPlans?.length > 0)) {
+          setPlan(parsedCache);
+        }
+      } catch (e) {
+        console.error("Cache parse error:", e);
+      }
+    }
+
     try {
       const res = await api.get('/diets/my-plan');
-      if (res.success && res.plan && res.plan.meals && res.plan.meals.length > 0) {
-        setPlan(res.plan);
+      if (res.success && res.plan) {
+        const hasMeals = (res.plan.meals && res.plan.meals.length > 0) || (res.plan.dailyPlans && res.plan.dailyPlans.length > 0);
+        if (hasMeals) {
+          if ((!res.plan.meals || res.plan.meals.length === 0) && res.plan.dailyPlans && res.plan.dailyPlans.length > 0) {
+            res.plan.meals = res.plan.dailyPlans[0].meals;
+          }
+          setPlan(res.plan);
+          localStorage.setItem('fitverse_active_diet_plan', JSON.stringify(res.plan));
+        } else {
+          setPlan(null);
+          localStorage.removeItem('fitverse_active_diet_plan');
+        }
       } else {
         setPlan(null);
+        localStorage.removeItem('fitverse_active_diet_plan');
       }
     } catch (err) {
       console.error(err);
@@ -41,12 +66,21 @@ const DietPage = () => {
   }, []);
 
   const handlePlanGenerated = (newPlan) => {
+    if ((!newPlan.meals || newPlan.meals.length === 0) && newPlan.dailyPlans && newPlan.dailyPlans.length > 0) {
+      newPlan.meals = newPlan.dailyPlans[0].meals;
+    }
     setPlan(newPlan);
+    setActiveDay(1);
+    localStorage.setItem('fitverse_active_diet_plan', JSON.stringify(newPlan));
     setActiveTab('home');
   };
 
   const handleLogUpdate = (updatedPlan) => {
+    if ((!updatedPlan.meals || updatedPlan.meals.length === 0) && updatedPlan.dailyPlans && updatedPlan.dailyPlans.length > 0) {
+      updatedPlan.meals = updatedPlan.dailyPlans[0].meals;
+    }
     setPlan(updatedPlan);
+    localStorage.setItem('fitverse_active_diet_plan', JSON.stringify(updatedPlan));
   };
 
   const handleResetPlan = async () => {
@@ -54,6 +88,8 @@ const DietPage = () => {
     try {
       await api.delete('/diets/my-plan');
       setPlan(null);
+      setActiveDay(1);
+      localStorage.removeItem('fitverse_active_diet_plan');
       setShowResetModal(false);
       setActiveTab('home');
       toast.success('Diet plan reset! You can now generate a fresh plan.');
@@ -74,22 +110,33 @@ const DietPage = () => {
     return `${y}-${m}-${d}`;
   };
 
-  // Quick stats values for Home tab
+  // Quick stats values for Home tab (calculated for activeDay)
   const getHomeStats = () => {
     if (!plan) return { calories: 0, targetCal: 2000, water: 0, targetWater: 3500 };
     const today = getTodayDateStr();
     const waterLog = plan.waterLogs ? plan.waterLogs.find(l => l.date === today) : null;
     const waterIntake = waterLog ? waterLog.intake : 0;
-    const completedMeals = plan.completedMealsLog 
-      ? plan.completedMealsLog.filter(l => l.date === today && l.status === 'Completed').map(l => l.meal)
+
+    const activeMeals = (plan.dailyPlans && plan.dailyPlans.length > 0)
+      ? (plan.dailyPlans.find(d => d.dayNumber === activeDay)?.meals || plan.dailyPlans[0]?.meals || [])
+      : (plan.meals || []);
+
+    const completedMealNames = plan.completedMealsLog 
+      ? plan.completedMealsLog
+          .filter(l => l.date === today && (l.dayNumber || 1) === activeDay && l.status === 'Completed')
+          .map(l => l.meal)
       : [];
+
     let consumedCalories = 0;
-    plan.meals.forEach(m => {
-      if (completedMeals.includes(m.meal)) consumedCalories += m.calories || 0;
+    activeMeals.forEach(m => {
+      if (completedMealNames.includes(m.meal)) consumedCalories += m.calories || 0;
     });
+
+    const activeTargetCal = activeMeals.reduce((acc, m) => acc + (m.calories || 0), 0) || plan.dailyCalories || 2000;
+
     return {
       calories: consumedCalories,
-      targetCal: plan.dailyCalories || 2000,
+      targetCal: activeTargetCal,
       water: waterIntake,
       targetWater: 3500
     };
@@ -109,7 +156,6 @@ const DietPage = () => {
     { id: 'home',      label: 'Diet Home', icon: <FaAppleAlt /> },
     { id: 'generator', label: 'AI Planner', icon: <FaPlus /> },
     { id: 'recipes',   label: 'Recipes',   icon: <FaUtensils /> },
-    { id: 'water',     label: 'Water',     icon: <FaTint /> },
     { id: 'dashboard', label: 'Analytics', icon: <FaChartBar /> },
     { id: 'grocery',   label: 'Groceries', icon: <FaShoppingCart /> },
   ];
@@ -186,63 +232,14 @@ const DietPage = () => {
                       </button>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                      <div className="lg:col-span-2 space-y-5">
-                        {/* Calories & Water summary */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {/* Calories */}
-                          <div className="p-5 bg-white dark:bg-slate-900 backdrop-blur-xl border border-slate-100 dark:border-white/5 rounded-2xl shadow-sm flex items-center justify-between gap-4">
-                            <div className="space-y-1">
-                              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-wider block">Calories Today</span>
-                              <h4 className="text-xl font-black text-slate-900 dark:text-white">{stats.calories} <span className="text-sm font-semibold text-slate-400">/ {stats.targetCal}</span></h4>
-                              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{stats.targetCal - stats.calories} kcal left</span>
-                            </div>
-                            <div className="relative w-14 h-14 flex items-center justify-center shrink-0">
-                              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 56 56">
-                                <circle cx="28" cy="28" r="22" className="stroke-slate-100 dark:stroke-slate-800" strokeWidth="5" fill="transparent" />
-                                <circle cx="28" cy="28" r="22" className="stroke-orange-500 transition-all" strokeWidth="5" fill="transparent"
-                                  strokeDasharray={2 * Math.PI * 22}
-                                  strokeDashoffset={(2 * Math.PI * 22) * (1 - Math.min(stats.calories / stats.targetCal, 1))}
-                                  strokeLinecap="round"
-                                />
-                              </svg>
-                              <FaFire className="absolute text-orange-500 text-sm" />
-                            </div>
-                          </div>
-
-                          {/* Water */}
-                          <div className="p-5 bg-white dark:bg-slate-900 backdrop-blur-xl border border-slate-100 dark:border-white/5 rounded-2xl shadow-sm flex items-center justify-between gap-4">
-                            <div className="space-y-1">
-                              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-wider block">Water Intake</span>
-                              <h4 className="text-xl font-black text-slate-900 dark:text-white">{stats.water} <span className="text-sm font-semibold text-slate-400">/ {stats.targetWater}ml</span></h4>
-                              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{stats.targetWater - stats.water > 0 ? stats.targetWater - stats.water : 0}ml left</span>
-                            </div>
-                            <div className="relative w-14 h-14 flex items-center justify-center shrink-0">
-                              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 56 56">
-                                <circle cx="28" cy="28" r="22" className="stroke-slate-100 dark:stroke-slate-800" strokeWidth="5" fill="transparent" />
-                                <circle cx="28" cy="28" r="22" className="stroke-blue-500 transition-all" strokeWidth="5" fill="transparent"
-                                  strokeDasharray={2 * Math.PI * 22}
-                                  strokeDashoffset={(2 * Math.PI * 22) * (1 - Math.min(stats.water / stats.targetWater, 1))}
-                                  strokeLinecap="round"
-                                />
-                              </svg>
-                              <FaTint className="absolute text-blue-500 text-sm" />
-                            </div>
-                          </div>
-                        </div>
-
-                        <MyDietPlan 
-                          plan={plan}
-                          onRegenerate={() => setActiveTab('generator')}
-                          onMealLogged={handleLogUpdate}
-                        />
-                      </div>
-
-                      {/* Right sidebar */}
-                      <div className="space-y-6">
-                        {/* Quick Water panel */}
-                        <WaterTracker plan={plan} onWaterLogged={handleLogUpdate} />
-                      </div>
+                    <div className="space-y-6">
+                      <MyDietPlan 
+                        plan={plan}
+                        activeDay={activeDay}
+                        setActiveDay={setActiveDay}
+                        onRegenerate={() => setActiveTab('generator')}
+                        onMealLogged={handleLogUpdate}
+                      />
                     </div>
                   )}
                 </>
@@ -260,7 +257,13 @@ const DietPage = () => {
                 </div>
               )}
 
-              {activeTab === 'dashboard' && <NutritionDashboard plan={plan} />}
+              {activeTab === 'dashboard' && (
+                <NutritionDashboard 
+                  plan={plan} 
+                  activeDay={activeDay}
+                  setActiveDay={setActiveDay}
+                />
+              )}
 
               {activeTab === 'grocery' && <GroceryList plan={plan} />}
 

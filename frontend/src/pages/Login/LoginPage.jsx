@@ -69,10 +69,10 @@ const LoginPage = () => {
 
         <div className="relative z-10 flex items-center gap-3">
           <Link to="/" className="inline-flex items-center gap-3 text-3xl font-black text-white hover:opacity-80 transition-opacity tracking-tight">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-lg shadow-primary-600/40">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-primary-600 to-violet-600 flex items-center justify-center shadow-lg shadow-primary-600/40">
               <FaDumbbell className="text-white text-2xl" />
             </div>
-            FitVerse AI
+            <span>FitVerse <span className="text-primary-400">AI</span></span>
           </Link>
         </div>
 
@@ -116,12 +116,9 @@ const LoginPage = () => {
         >
           <div className="glass-card p-8 sm:p-12">
             
-            <div className="mb-10 text-center">
-              {/* <div className="w-16 h-16 bg-primary-50 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
-                <span className="text-3xl"></span>
-              </div> */}
-              <h2 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">Welcome Back</h2>
-              <p className="text-slate-500 font-medium">Please enter your details to sign in</p>
+            <div className="mb-8 text-center">
+              <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">Welcome Back</h2>
+              <p className="text-slate-500 dark:text-slate-400 font-medium">Please enter your details to sign in</p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} method="POST" action="" className="space-y-5">

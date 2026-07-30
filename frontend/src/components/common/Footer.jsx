@@ -16,10 +16,12 @@ const Footer = () => {
           {/* Brand & Description */}
           <div className="lg:col-span-4">
             <Link to="/" className="flex items-center gap-3 mb-6 group shrink-0">
-              <div className="w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center transition-transform group-hover:scale-105 shadow-lg shadow-primary-500/20">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary-600 to-violet-600 flex items-center justify-center transition-transform group-hover:scale-105 shadow-md shadow-primary-500/20 shrink-0">
                 <FaDumbbell className="text-white text-xl" />
               </div>
-              <span className="text-3xl font-black text-white tracking-tight">FitVerse AI</span>
+              <span className="text-3xl font-black text-white tracking-tight">
+                FitVerse <span className="text-primary-500">AI</span>
+              </span>
             </Link>
             <p className="text-slate-400 text-base leading-relaxed mb-8 pr-4 font-medium">
               Experience the future of fitness. Our AI-powered platform and elite community are here to help you unlock your ultimate potential.

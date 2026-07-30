@@ -57,12 +57,12 @@ const ResetPasswordPage = () => {
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} 
         className="w-full max-w-md relative z-10"
       >
-        <div className="text-center mb-10">
-          <Link to="/" className="inline-flex items-center gap-3 text-3xl font-black text-slate-900 tracking-tight">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-lg shadow-primary-600/40">
+        <div className="text-center mb-8">
+          <Link to="/" className="inline-flex items-center gap-3 text-3xl font-black text-slate-900 dark:text-white tracking-tight hover:opacity-90 transition-opacity">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-primary-600 to-violet-600 flex items-center justify-center shadow-lg shadow-primary-600/40">
               <FaDumbbell className="text-white text-2xl" />
             </div>
-            FitVerse AI
+            <span>FitVerse <span className="text-primary-500">AI</span></span>
           </Link>
         </div>
 

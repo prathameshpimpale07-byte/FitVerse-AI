@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaRobot, FaPaperPlane, FaTrash, FaUser, FaMicrophone } from 'react-icons/fa';
+import { FaRobot, FaPaperPlane, FaTrash, FaUser, FaMicrophone, FaExclamationTriangle } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
@@ -16,6 +16,20 @@ const QUICK_PROMPTS = [
 
 // Renders AI replies using react-markdown with custom Tailwind styles
 const MessageContent = ({ content }) => {
+  const isScopeRefusal = content.includes('Scope Constraint') || content.includes('I can only assist with workout');
+
+  if (isScopeRefusal) {
+    return (
+      <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 flex items-start gap-3 text-amber-200 shadow-lg shadow-amber-950/20">
+        <FaExclamationTriangle className="text-amber-400 text-lg shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <p className="font-extrabold text-xs uppercase tracking-wider text-amber-300">Workout & Diet Scope Only</p>
+          <p className="text-sm font-medium leading-relaxed text-amber-100/90">{content.replace(/⚠️\s*\*\*Scope Constraint\*\*:\s*/, '')}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="text-sm text-slate-200 font-normal leading-relaxed space-y-3">
       <ReactMarkdown

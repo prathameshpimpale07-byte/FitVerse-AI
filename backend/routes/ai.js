@@ -13,20 +13,89 @@ const UserDietPlan = require('../models/UserDietPlan');
 const Progress = require('../models/Progress');
 const { retrieveKnowledgeAndContext } = require('../utils/ragEngine');
 
+const OFF_TOPIC_REFUSAL = "⚠️ **Scope Constraint**: I am your dedicated FitVerse AI Fitness & Nutrition Coach. I can only assist with workout routines, exercise form, gym training, diet plans, nutrition, health, and fitness goals. Please ask me a fitness or diet-related question! 💪🥗";
+
+const isOffTopicQuery = (userQuery) => {
+  if (!userQuery || typeof userQuery !== 'string') return true;
+  const q = userQuery.toLowerCase().trim();
+
+  // Keyword whitelist for fitness, gym, workouts, health & diet domain
+  const fitnessKeywords = [
+    'workout', 'work out', 'exercise', 'gym', 'muscle', 'chest', 'back', 'leg', 'arm', 'bicep', 'tricep',
+    'shoulder', 'abs', 'core', 'cardio', 'run', 'jog', 'walk', 'bench', 'press', 'squat', 'deadlift', 'lunge',
+    'dumbbell', 'barbell', 'weight', 'set', 'rep', 'hypertrophy', 'endurance', 'stamina', 'flexibility',
+    'mobility', 'stretch', 'sore', 'soreness', 'doms', 'injury', 'pain', 'recovery', 'rest', 'sleep',
+    'protein', 'carb', 'carbohydrate', 'fat', 'calorie', 'kcal', 'diet', 'food', 'meal', 'recipe',
+    'breakfast', 'lunch', 'dinner', 'snack', 'vegan', 'veg', 'vegetarian', 'non-veg', 'keto', 'fast',
+    'fasting', 'water', 'hydration', 'supplement', 'creatine', 'whey', 'bcaa', 'vitamin', 'lose',
+    'gain', 'bulk', 'cut', 'fitness', 'body', 'bmi', 'health', 'train', 'trainer', 'coach', 'fitverse',
+    'pushup', 'push-up', 'pullup', 'pull-up', 'plank', 'hiit', 'treadmill', 'gram', 'eat', 'eating',
+    'drink', 'drinking', 'physique', 'form', 'posture', 'warmup', 'cooldown', 'calisthenics',
+    'tdee', 'bmr', 'macro', 'micro', 'nutrient', 'nutrition', 'strength', 'waist', 'stomach', 'belly',
+    'thigh', 'glute', 'butt', 'hip', 'calves', 'neck', 'trap', 'delt', 'lat', 'oblique', 'forearm',
+    'mass', 'lean', 'obese', 'skinny', 'fat loss', 'weight loss', 'muscle gain', 'weight gain',
+    'pre-workout', 'preworkout', 'post-workout', 'postworkout', 'shake', 'smoothie', 'egg', 'chicken',
+    'fish', 'meat', 'rice', 'oats', 'oatmeal', 'milk', 'paneer', 'tofu', 'soya', 'fruit', 'apple',
+    'banana', 'vegetable', 'salad', 'junk', 'cheat meal', 'sugar', 'salt', 'hi', 'hello', 'hey',
+    'help', 'who are you', 'what can you do', 'advise', 'advice', 'tip', 'suggest', 'recommend'
+  ];
+
+  const hasFitnessKeyword = fitnessKeywords.some(kw => q.includes(kw));
+  if (hasFitnessKeyword) return false;
+
+  const offTopicTriggers = [
+    'code', 'coding', 'program', 'programming', 'javascript', 'python', 'java', 'html', 'css', 'react',
+    'node', 'sql', 'database', 'math', 'calculus', 'solve', 'equation', 'capital of', 'who is', 'who was',
+    'president', 'movie', 'song', 'singer', 'joke', 'tell me a joke', 'game', 'gaming', 'politics',
+    'weather', 'news', 'crypto', 'bitcoin', 'stock', 'essay', 'poem', 'story', 'translate', 'history',
+    'geography', 'physics', 'chemistry'
+  ];
+
+  const hasOffTopicTrigger = offTopicTriggers.some(trigger => q.includes(trigger));
+  if (hasOffTopicTrigger) return true;
+
+  return false;
+};
+
+const MEAL_IMAGE_MAP = {
+  oats: "https://images.unsplash.com/photo-1517673400267-0251440c45dc?w=800&auto=format&fit=crop&q=80",
+  oatmeal: "https://images.unsplash.com/photo-1517673400267-0251440c45dc?w=800&auto=format&fit=crop&q=80",
+  pancake: "https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=800&auto=format&fit=crop&q=80",
+  egg: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&auto=format&fit=crop&q=80",
+  omelet: "https://images.unsplash.com/photo-1510693206972-df098062cb71?w=800&auto=format&fit=crop&q=80",
+  chicken: "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=800&auto=format&fit=crop&q=80",
+  salad: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&auto=format&fit=crop&q=80",
+  rice: "https://images.unsplash.com/photo-1516714435131-44d6b64dc6a2?w=800&auto=format&fit=crop&q=80",
+  paneer: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&auto=format&fit=crop&q=80",
+  fish: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800&auto=format&fit=crop&q=80",
+  salmon: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&auto=format&fit=crop&q=80",
+  smoothie: "https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=800&auto=format&fit=crop&q=80",
+  shake: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=800&auto=format&fit=crop&q=80",
+  yogurt: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=800&auto=format&fit=crop&q=80",
+  fruit: "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=800&auto=format&fit=crop&q=80",
+  banana: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=800&auto=format&fit=crop&q=80",
+  apple: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=800&auto=format&fit=crop&q=80",
+  nuts: "https://images.unsplash.com/photo-1536591375315-1b836802e3a1?w=800&auto=format&fit=crop&q=80",
+  almond: "https://images.unsplash.com/photo-1508061252966-177209772a80?w=800&auto=format&fit=crop&q=80",
+  bread: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=80",
+  toast: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&auto=format&fit=crop&q=80",
+  soup: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&auto=format&fit=crop&q=80",
+  curry: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&auto=format&fit=crop&q=80",
+  roti: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&auto=format&fit=crop&q=80",
+  dal: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800&auto=format&fit=crop&q=80"
+};
+
 const getImageUrlForMeal = async (foodsArray) => {
-  if (!foodsArray || foodsArray.length === 0) return '';
-  const query = foodsArray[0];
-  try {
-    const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`);
-    const data = await res.json();
-    if (data.meals && data.meals.length > 0) {
-      return data.meals[0].strMealThumb;
-    }
-  } catch (e) {
-    console.error('Image fetch error:', e.message);
+  if (!foodsArray || foodsArray.length === 0) {
+    return "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=800&auto=format&fit=crop&q=80";
   }
-  const lockId = Math.floor(Math.random() * 1000);
-  return `https://loremflickr.com/600/400/${encodeURIComponent(query.split(' ')[0])},food?lock=${lockId}`;
+  const text = foodsArray.join(' ').toLowerCase();
+  for (const [key, url] of Object.entries(MEAL_IMAGE_MAP)) {
+    if (text.includes(key)) {
+      return url;
+    }
+  }
+  return "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=800&auto=format&fit=crop&q=80";
 };
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
@@ -101,40 +170,139 @@ router.post("/generate-workout", protect, async (req, res) => {
 
     const user = await User.findById(userId);
 
-    const systemPrompt = `You are a Certified Personal Trainer, Sports Nutrition Advisor, Recovery Coach, Fitness Motivator, and Progress Analyst.
-You are designing a professional, highly structured weekly workout plan for a user with the following profile:
-- Age: ${age || user.age || 25}
-- Gender: ${gender || user.gender || 'male'}
-- Height: ${height || user.height || 175}cm
-- Weight: ${weight || user.weight || 70}kg
-- Fitness Goal: ${goal || user.fitnessGoal || 'general fitness'}
-- Workout Experience: ${experience || 'Intermediate'}
-- Workout Days per Week: 6 days
-- Target Session Duration: ${duration || 60} minutes
-- Gym Equipment Available: ${equipment || 'Gym'}
-- Medical Conditions: ${medicalConditions || 'None'}
-- Injuries: ${injuries || 'None'}
-- Workout Preference: ${preference || 'Mixed'}
-- Plan Generation Seed: ${Date.now()}
+    const userGoal = goal || user.fitnessGoal || 'muscle_gain';
+    const userDays = parseInt(workoutDays) || 6;
+    const userEquipment = equipment || 'Gym';
+    const userAge = age || user.age || 25;
+    const userGender = gender || user.gender || 'male';
+    const userHeight = height || user.height || 175;
+    const userWeight = weight || user.weight || 70;
+    const userExperience = experience || 'Intermediate';
+    const userDuration = duration || 60;
+    const userMedical = medicalConditions || 'None';
+    const userInjuries = injuries || 'None';
+    const userPreference = preference || 'Mixed';
 
-IMPORTANT: You MUST generate workout routines for exactly 6 days: Monday, Tuesday, Wednesday, Thursday, Friday, and Saturday. Only Sunday should be a Rest Day (return an empty array [] for Sunday). Do not make Wednesday, Saturday, or any other weekdays rest days; they must contain workouts.
+    // Goal-specific tailoring
+    let goalInstructions = "";
+    const cleanGoal = userGoal.toLowerCase().replace(/[^a-z0-9_]/g, '');
 
-IMPORTANT: Generate a fresh, unique routine. Do not replicate the same exercises. Introduce variations in exercise selection, reps, and progression techniques.
+    if (cleanGoal.includes('muscle') || cleanGoal.includes('hypertrophy') || cleanGoal.includes('bulk')) {
+      goalInstructions = `
+CRITICAL GOAL REQUIREMENT [MUSCLE GAIN / HYPERTROPHY]:
+- Target: Muscle building, muscle hypertrophy, and progressive load strength gains.
+- Exercises: Focus on compound muscle-building exercises (e.g. Bench Press, Incline Press, Squats, Deadlifts, Overhead Press, Barbell/Dumbbell Rows, Lat Pulldowns, Bicep Curls, Tricep Dip/Extensions, Leg Press).
+- Sets & Reps: 3 to 4 sets of 8 to 12 reps per exercise (hypertrophy range).
+- Rest: 60 to 90 seconds rest between sets.
+- Structure: Clear split (e.g. Push, Pull, Legs, Upper, Lower).`;
+    } else if (cleanGoal.includes('weight') || cleanGoal.includes('loss') || cleanGoal.includes('fat') || cleanGoal.includes('cut')) {
+      goalInstructions = `
+CRITICAL GOAL REQUIREMENT [WEIGHT LOSS / FAT BURN]:
+- Target: High calorie expenditure, maximum fat burn, high heart rate, metabolic conditioning.
+- Exercises: Focus on high-energy burning exercises, dynamic bodyweight/kettlebell movements, circuits, supersets, HIIT elements, and cardio conditioning (e.g. Burpees, Mountain Climbers, Jump Squats, Kettlebell Swings, Dumbbell Thrusters, High Knees, Box Jumps, Running/Jumping Jacks, Bicycle Crunches, Plank Jacks).
+- Sets & Reps: 3 to 4 sets of 12 to 20 reps per exercise (or timed work intervals).
+- Rest: Short rest periods of 30 to 45 seconds to maintain high heart rate in fat-burning zone.
+- Structure: Full Body Conditioning, HIIT Circuits, Fat Burn splits.`;
+    } else if (cleanGoal.includes('endurance') || cleanGoal.includes('stamina')) {
+      goalInstructions = `
+CRITICAL GOAL REQUIREMENT [ENDURANCE & STAMINA]:
+- Target: Muscular endurance, aerobic stamina, cardiovascular health.
+- Exercises: High-rep resistance movements, functional bodyweight, cardio intervals, jump rope, kettlebell circuits.
+- Sets & Reps: 3 to 4 sets of 15 to 25 reps.
+- Rest: 30 seconds rest.`;
+    } else if (cleanGoal.includes('flexibility') || cleanGoal.includes('mobility')) {
+      goalInstructions = `
+CRITICAL GOAL REQUIREMENT [FLEXIBILITY & MOBILITY]:
+- Target: Mobility, joint health, core stability, active recovery, postural control.
+- Exercises: Dynamic stretches, resistance band mobility, bodyweight flows, cat-cow, glute bridges, bird-dogs, yoga-inspired movements.
+- Sets & Reps: 2 to 3 sets of 10-15 controlled reps or 60-second active holds.
+- Rest: 30 to 45 seconds.`;
+    } else {
+      goalInstructions = `
+CRITICAL GOAL REQUIREMENT [GENERAL FITNESS]:
+- Target: Balanced strength, core stability, moderate cardio health.
+- Exercises: Mix of core strength movements and light cardio.
+- Sets & Reps: 3 sets of 10 to 12 reps.
+- Rest: 60 seconds rest.`;
+    }
 
-Generate a structured weekly workout plan in EXACT JSON format. Do not include any markdown wrappers or introductory texts, only return the raw JSON matching the following structure:
+    // Equipment constraint instructions
+    let equipmentInstructions = "";
+    const cleanEquip = userEquipment.toLowerCase();
+    if (cleanEquip.includes('bodyweight')) {
+      equipmentInstructions = `
+EQUIPMENT CONSTRAINT [BODYWEIGHT ONLY]:
+- You MUST ONLY select bodyweight exercises that require ZERO equipment (e.g. Push-ups, Diamond Push-ups, Pike Push-ups, Bodyweight Squats, Lunges, Jump Squats, Planks, Burpees, Mountain Climbers, Dips, Glute Bridges).
+- ABSOLUTELY DO NOT list exercises requiring barbells, dumbbells, cables, or gym machines!`;
+    } else if (cleanEquip.includes('dumbbell')) {
+      equipmentInstructions = `
+EQUIPMENT CONSTRAINT [DUMBBELLS ONLY]:
+- You MUST ONLY select exercises using Dumbbells or Bodyweight (e.g. Dumbbell Bench Press, Dumbbell Goblet Squats, Dumbbell Romanian Deadlifts, Dumbbell Rows, Dumbbell Overhead Press, Dumbbell Curls, Dumbbell Tricep Extensions, Lunges).
+- ABSOLUTELY DO NOT list exercises requiring barbells, cable machines, or heavy gym equipment!`;
+    } else {
+      equipmentInstructions = `
+EQUIPMENT CONSTRAINT [FULL GYM]:
+- You have full access to Barbells, Dumbbells, Cable Machines, Leg Press, Lat Pulldowns, Smith Machine, and Bodyweight exercises.`;
+    }
+
+    // Weekly days instructions
+    const daysInstructions = `
+WEEKLY SCHEDULE CONSTRAINT:
+- Target Training Days: ${userDays} days out of 7.
+- Required day keys in JSON: "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday".
+- Provide exactly ${userDays} active workout days with 4-6 exercises tailored to the goal.
+- For the remaining ${7 - userDays} days, return an empty array [] representing Rest / Recovery Days.`;
+
+    let safetyInstructions = "";
+    if (userInjuries && userInjuries !== 'None' && userInjuries.trim() !== '') {
+      safetyInstructions += `\n- INJURY NOTICE: User has reported injury/pain in: "${userInjuries}". Avoid exercises that strain this area and suggest safe low-impact options.`;
+    }
+    if (userMedical && userMedical !== 'None' && userMedical.trim() !== '') {
+      safetyInstructions += `\n- MEDICAL NOTICE: User has reported condition: "${userMedical}". Ensure exercise intensity is safe.`;
+    }
+
+    const systemPrompt = `You are an expert Certified Personal Trainer, Strength & Conditioning Specialist, and Sports Nutritionist.
+You are generating a professional, customized 7-day workout plan strictly based on the following user inputs:
+
+USER PROFILE & FORM INPUTS:
+- Fitness Goal: ${userGoal}
+- Equipment Available: ${userEquipment}
+- Workout Days per Week: ${userDays}
+- Target Session Duration: ${userDuration} minutes
+- Experience Level: ${userExperience}
+- Preference: ${userPreference}
+- Age: ${userAge} | Gender: ${userGender} | Height: ${userHeight}cm | Weight: ${userWeight}kg
+- Medical Conditions: ${userMedical}
+- Reported Injuries: ${userInjuries}
+- Seed: ${Date.now()}
+
+${goalInstructions}
+
+${equipmentInstructions}
+
+${daysInstructions}
+${safetyInstructions}
+
+OUTPUT FORMAT RULES:
+Return ONLY raw, valid JSON. Do not include markdown code block formatting (\`\`\`json), intro text, or extra commentary. The output must match this exact JSON structure:
 {
   "weeklySplit": {
     "Monday": [
-      { "exerciseName": "Bench Press", "sets": 4, "reps": "10-12", "rest": "90 sec" }
-    ]
+      { "exerciseName": "Bench Press", "sets": 3, "reps": "8-12", "rest": "60 sec" }
+    ],
+    "Tuesday": [],
+    "Wednesday": [],
+    "Thursday": [],
+    "Friday": [],
+    "Saturday": [],
+    "Sunday": []
   },
-  "progressiveOverloadSuggestions": "Increase weight by 2.5kg when you hit 12 reps on all sets.",
-  "warmUp": "5-10 minutes of active stretching and light cardio.",
-  "coolDown": "5-10 minutes of static stretching for target muscles.",
-  "recoveryAdvice": "Sleep 8 hours, consume 1.6g protein per kg bodyweight, hydrate.",
-  "motivation": "Your only limit is you. Push hard and be consistent!"
-}
-Fill out all days of the weekly split based on the workout days per week. Avoid duplicate exercises per day. Include proper recovery days. Use exercise names that are standard.`;
+  "progressiveOverloadSuggestions": "Clear progressive overload strategy for ${userGoal}",
+  "warmUp": "5-10 min dynamic warm-up routine for ${userGoal}",
+  "coolDown": "5-10 min static cool-down stretch for target muscles",
+  "recoveryAdvice": "Tailored recovery, protein/hydration advice for ${userGoal}",
+  "motivation": "Inspiring motivation tailored to ${userGoal}"
+}`;
 
     const textResponse = await generateWithFallback(systemPrompt);
 
@@ -153,6 +321,9 @@ Fill out all days of the weekly split based on the workout days per week. Avoid 
     // Save the new plan in database
     const newPlan = await WorkoutPlan.create({
       userId,
+      goal: userGoal,
+      equipment: userEquipment,
+      workoutDays: userDays,
       weeklySplit: parsedPlan.weeklySplit,
       progressiveOverloadSuggestions: parsedPlan.progressiveOverloadSuggestions,
       warmUp: parsedPlan.warmUp,
@@ -192,6 +363,23 @@ router.post("/chat", protect, async (req, res) => {
     }
 
     const userId = req.user._id;
+
+    // Fast domain pre-check for obvious off-topic queries
+    if (isOffTopicQuery(message)) {
+      let conversation = await AIConversation.findOne({ userId });
+      if (!conversation) {
+        conversation = await AIConversation.create({ userId, messages: [] });
+      }
+      conversation.messages.push({ role: 'user', content: message });
+      conversation.messages.push({ role: 'model', content: OFF_TOPIC_REFUSAL });
+      if (conversation.messages.length > 30) {
+        conversation.messages = conversation.messages.slice(-30);
+      }
+      await conversation.save();
+
+      return res.json({ success: true, reply: OFF_TOPIC_REFUSAL, messages: conversation.messages });
+    }
+
     if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({ success: false, message: "Gemini API key is missing" });
     }
@@ -213,13 +401,15 @@ router.post("/chat", protect, async (req, res) => {
 
     const systemPrompt = `${augmentedPrompt}
 
-CRITICAL FORMATTING RULES:
-1. Always use Markdown formatting to make your responses visually appealing and easy to read.
-2. 🚨 USE EMOJIS LIBERALLY! 🚨 Every single bullet point, heading, and paragraph should contain relevant emojis (e.g., 🔥, 💪, 🥗, 🏋️‍♂️, ⚡, 🧠, 💧, 📈).
-3. Structure answers using bullet points (• or emojis) under bold headers.
-4. If recommending exercises, list them as: • Exercise Name — sets x reps (rest period) — brief tip on form.
-5. End every response with a strong motivational line prefixed with 🎯.
-6. Jump straight into the value. Do NOT wrap in markdown code blocks or prefix with "Coach:".`;
+CRITICAL FORMATTING & SCOPE RULES:
+1. MANDATORY DOMAIN RESTRICTION: You MUST ONLY answer workout, gym, fitness, health, diet, and nutrition questions. For ANY non-fitness/non-diet question (e.g. coding, math, general trivia, movies, politics), output ONLY the exact refusal message:
+"${OFF_TOPIC_REFUSAL}"
+2. Always use Markdown formatting to make your responses visually appealing and easy to read.
+3. 🚨 USE EMOJIS LIBERALLY! 🚨 Every single bullet point, heading, and paragraph should contain relevant emojis (e.g., 🔥, 💪, 🥗, 🏋️‍♂️, ⚡, 🧠, 💧, 📈).
+4. Structure answers using bullet points (• or emojis) under bold headers.
+5. If recommending exercises, list them as: • Exercise Name — sets x reps (rest period) — brief tip on form.
+6. End every workout/diet response with a strong motivational line prefixed with 🎯.
+7. Jump straight into the value. Do NOT wrap in markdown code blocks or prefix with "Coach:".`;
 
     const rawReply = await generateWithFallback(systemPrompt, { temperature: 0.7 });
     const replyText = rawReply.trim();
@@ -259,12 +449,22 @@ router.post("/generate-diet", protect, async (req, res) => {
     const { 
       gender, age, height, weight, goalWeight, goal, activityLevel,
       workoutDays, workoutTime, preference, country, state, budget,
-      allergies, medicalConditions, dailyMeals, waterIntake, cookingSkill,
-      availability, supplements, sleepTime, wakeTime, dietDuration
+      dietDuration, dailyMeals, allergies, medicalConditions,
+      sleepTime, wakeTime, cookingSkill, supplements
     } = req.body;
 
-    if (age && Number(age) < 10) {
-      return res.status(400).json({ success: false, message: "Age must be 10 years and above" });
+    const targetDays = Number(dietDuration) || 1;
+    const targetMealsCount = Number(dailyMeals) || 4;
+
+    let goalInstruction = "";
+    if (goal === 'weight_loss') {
+      goalInstruction = "STRICT GOAL REQUIREMENT: The user wants WEIGHT LOSS / FAT CUT. Calculate a clear caloric deficit (e.g. 1600 - 2000 kcal). Select meals that are high in protein, rich in fiber, low in sugar and refined carbs, and explicitly tailored for burning fat and weight loss.";
+    } else if (goal === 'muscle_gain') {
+      goalInstruction = "STRICT GOAL REQUIREMENT: The user wants MUSCLE BUILDING / BULKING. Calculate a caloric surplus (e.g. 2600 - 3200 kcal). Select meals high in protein (150g+) and high clean carbohydrates for muscle growth and recovery.";
+    } else if (goal === 'maintenance') {
+      goalInstruction = "STRICT GOAL REQUIREMENT: The user wants LEAN RECOMPOSITION / MAINTENANCE. Balance calories around TDEE (2000 - 2400 kcal) with high protein.";
+    } else {
+      goalInstruction = "STRICT GOAL REQUIREMENT: The user wants ATHLETIC ENDURANCE. Provide balanced nutrients with high complex carbs for stamina.";
     }
 
     const systemPrompt = `You are a Certified Nutritionist, Dietitian, and AI Health Coach.
@@ -286,15 +486,17 @@ You are designing a professional, personalized weekly nutrition and meal plan fo
 - Sleep/Wake Cycle: Sleep at ${sleepTime || '11:00 PM'}, Wake at ${wakeTime || '6:00 AM'}
 - Cooking Skill: ${cookingSkill || 'Intermediate'}
 - Supplements: ${supplements || 'None'}
-- Target Daily Meals Count: ${dailyMeals || 4} meals
-- Diet Plan Duration: ${dietDuration || 1} Days
+- Target Daily Meals Count: ${targetMealsCount} meals per day
+- Diet Plan Duration: EXACTLY ${targetDays} Days
+
+${goalInstruction}
 
 Generate a structured multi-day diet plan in EXACT JSON format. Do not include any markdown wrappers or introductory texts, only return the raw JSON matching the following structure:
 {
-  "dailyCalories": 2400,
-  "protein": "140g",
-  "carbs": "280g",
-  "fat": "65g",
+  "dailyCalories": 2000,
+  "protein": "130g",
+  "carbs": "220g",
+  "fat": "60g",
   "water": "3.5L",
   "dailyPlans": [
     {
@@ -304,13 +506,13 @@ Generate a structured multi-day diet plan in EXACT JSON format. Do not include a
         {
           "meal": "Breakfast",
           "time": "8:00 AM",
-          "foods": ["Oats", "Milk", "Banana", "Peanut Butter"],
+          "foods": ["Oats", "Milk", "Banana"],
           "prepTime": 10,
-          "recipe": "Boil oats...",
-          "calories": 520,
+          "recipe": "Boil oats in milk...",
+          "calories": 450,
           "protein": 18,
-          "carbs": 72,
-          "fat": 14
+          "carbs": 65,
+          "fat": 10
         }
       ]
     }
@@ -318,14 +520,44 @@ Generate a structured multi-day diet plan in EXACT JSON format. Do not include a
   "shoppingList": ["Oats", "Milk", "Bananas"]
 }
 
-Important Rules:
-1. Adjust calories and macros carefully based on user's metrics and fitness goal.
-2. Respect allergies, budget limits, and dietary preference.
-3. Align meal timings with sleep, wake, and workout times.
-4. Generate exactly ${dietDuration || 1} unique daily plans in the dailyPlans array, incrementing dayNumber and dayName for each.`;
+CRITICAL MANDATORY RULES:
+1. Generate EXACTLY ${targetDays} unique daily plans inside the "dailyPlans" array (dayNumber: 1 to ${targetDays}, dayName: "Day 1", "Day 2", etc.).
+2. Each day inside "dailyPlans" MUST contain exactly ${targetMealsCount} meals (e.g. Breakfast, Lunch, Snack, Dinner).
+3. Adjust calories and macros strictly according to the fitness goal (${goal}).`;
 
     const textResponse = await generateWithFallback(systemPrompt);
     const parsedPlan = cleanAndParseJSON(textResponse);
+
+    if (!parsedPlan) {
+      return res.status(500).json({ success: false, message: "Failed to parse AI-generated diet plan." });
+    }
+
+    // Ensure dailyPlans exists and has EXACTLY targetDays length
+    if (!parsedPlan.dailyPlans || !Array.isArray(parsedPlan.dailyPlans) || parsedPlan.dailyPlans.length === 0) {
+      parsedPlan.dailyPlans = [];
+    }
+
+    // If AI returned fewer days than requested, expand dailyPlans to match targetDays
+    if (parsedPlan.dailyPlans.length < targetDays) {
+      const baseMeals = (parsedPlan.dailyPlans[0] && parsedPlan.dailyPlans[0].meals && parsedPlan.dailyPlans[0].meals.length > 0)
+        ? parsedPlan.dailyPlans[0].meals
+        : (parsedPlan.meals || []);
+
+      for (let i = parsedPlan.dailyPlans.length + 1; i <= targetDays; i++) {
+        parsedPlan.dailyPlans.push({
+          dayNumber: i,
+          dayName: `Day ${i}`,
+          meals: JSON.parse(JSON.stringify(baseMeals))
+        });
+      }
+    } else if (parsedPlan.dailyPlans.length > targetDays) {
+      parsedPlan.dailyPlans = parsedPlan.dailyPlans.slice(0, targetDays);
+    }
+
+    // Ensure top-level meals exists as fallback
+    if (parsedPlan.dailyPlans.length > 0 && parsedPlan.dailyPlans[0].meals) {
+      parsedPlan.meals = parsedPlan.dailyPlans[0].meals;
+    }
 
     // Fetch images for daily plans
     if (parsedPlan.dailyPlans) {
@@ -337,20 +569,8 @@ Important Rules:
         }
       }
     }
-    // Fetch images for fallback meals
-    if (parsedPlan.meals) {
-      for (let meal of parsedPlan.meals) {
-        if (!meal.imageUrl) {
-          meal.imageUrl = await getImageUrlForMeal(meal.foods);
-        }
-      }
-    }
 
-    if (!parsedPlan) {
-      return res.status(500).json({ success: false, message: "Failed to parse AI-generated diet plan." });
-    }
-
-    // Save or update user's plan in DB
+    // Save or update user's plan in DB, and reset completedMealsLog for fresh plan
     let userPlan = await UserDietPlan.findOne({ userId });
     if (userPlan) {
       userPlan.dailyCalories = parsedPlan.dailyCalories;
@@ -359,9 +579,10 @@ Important Rules:
       userPlan.fat = parsedPlan.fat;
       userPlan.water = parsedPlan.water;
       userPlan.goal = goal || 'general_fitness';
-      userPlan.dailyPlans = parsedPlan.dailyPlans || [];
-      if (parsedPlan.meals) userPlan.meals = parsedPlan.meals; // Fallback
+      userPlan.dailyPlans = parsedPlan.dailyPlans;
+      userPlan.meals = parsedPlan.meals || [];
       userPlan.shoppingList = parsedPlan.shoppingList;
+      userPlan.completedMealsLog = []; // Reset meal checklist for new plan
     } else {
       userPlan = new UserDietPlan({
         userId,
@@ -371,9 +592,10 @@ Important Rules:
         fat: parsedPlan.fat,
         water: parsedPlan.water,
         goal: goal || 'general_fitness',
-        dailyPlans: parsedPlan.dailyPlans || [],
+        dailyPlans: parsedPlan.dailyPlans,
         meals: parsedPlan.meals || [],
-        shoppingList: parsedPlan.shoppingList
+        shoppingList: parsedPlan.shoppingList,
+        completedMealsLog: []
       });
     }
     await userPlan.save();
@@ -389,7 +611,14 @@ Important Rules:
 router.post("/diet-chat", protect, async (req, res) => {
   try {
     const { message } = req.body;
+    if (!message) {
+      return res.status(400).json({ success: false, message: "Message is required." });
+    }
     const userId = req.user._id;
+
+    if (isOffTopicQuery(message)) {
+      return res.json({ success: true, reply: OFF_TOPIC_REFUSAL });
+    }
 
     let plan = await UserDietPlan.findOne({ userId });
     const user = await User.findById(userId);
@@ -407,14 +636,21 @@ User Info:
 Current Active Diet Plan:
 ${plan ? JSON.stringify(plan.meals, null, 2) : 'No active plan generated yet.'}
 
-Guidelines:
+CRITICAL MANDATORY DOMAIN RESTRICTION RULE:
+You are EXCLUSIVELY an AI Diet, Nutrition, and Fitness Coach. You MUST ONLY answer questions directly related to nutrition, diet, food, meals, recipes, macros, calories, supplements, hydration, workouts, and health.
+IF THE USER'S QUESTION IS NOT RELATED TO DIET, NUTRITION, FOOD, HEALTH, FITNESS, OR WORKOUTS (e.g. coding, math, general trivia, movies, politics):
+YOU MUST REFUSE TO ANSWER.
+Respond EXACTLY with:
+"${OFF_TOPIC_REFUSAL}"
+
+Guidelines for diet/fitness questions:
 1. Address the user's diet request. If they want to swap a food (e.g. "I don't like broccoli"), suggest a healthy alternative with similar macros (e.g. spinach or asparagus) and tell them exactly how it fits.
 2. Keep responses brief, practical, and highly motivating (under 3 paragraphs).
 3. If they ask you to modify their active plan, describe the changes clearly.
 
 New User Message: "${message}"
 
-Respond directly and concisely. Do not wrap in markdown.`;
+Respond directly and concisely. Do not wrap in markdown code blocks.`;
 
     const rawReply = await generateWithFallback(systemPrompt, { temperature: 0.7 });
     const replyText = rawReply.trim();

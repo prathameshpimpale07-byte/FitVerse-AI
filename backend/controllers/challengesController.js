@@ -1,4 +1,5 @@
 const Challenge = require('../models/Challenge');
+const createNotification = require('../utils/createNotification');
 
 // Seed some initial challenges if none exist
 const seedChallenges = async () => {
@@ -64,9 +65,26 @@ exports.joinChallenge = async (req, res) => {
     }
     challenge.participantsCount += 1;
     await challenge.save();
+
+    if (req.user) {
+      createNotification({
+        userId: req.user._id,
+        userEmail: req.user.email,
+        userName: req.user.name,
+        title: '🔥 Challenge Joined!',
+        description: `You joined "${challenge.title}". Target: ${challenge.target}. Reward: +${challenge.rewards?.xp || 0} XP & +${challenge.rewards?.coins || 0} Coins. Good luck!`,
+        category: 'Challenge',
+        priority: 'High',
+        icon: 'FaTrophy',
+        actionUrl: '/dashboard/challenges',
+        actionText: 'View Challenge'
+      }).catch(console.error);
+    }
+
     res.json({ success: true, message: "Joined challenge successfully!", challenge });
   } catch (error) {
     console.error("Join Challenge Error:", error);
     res.status(500).json({ success: false, message: "Server error joining challenge." });
   }
 };
+

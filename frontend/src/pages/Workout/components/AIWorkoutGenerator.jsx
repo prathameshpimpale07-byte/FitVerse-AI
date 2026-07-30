@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaRobot, FaDumbbell, FaCalendarAlt, FaFire, FaCheckCircle, FaExclamationCircle, FaPlay } from 'react-icons/fa';
+import { FaRobot, FaDumbbell, FaCalendarAlt, FaFire, FaCheckCircle, FaExclamationCircle, FaPlay, FaTrophy, FaTools } from 'react-icons/fa';
 import api from '../../../services/api';
 import toast from 'react-hot-toast';
+import { resolveExerciseVideo, formatEmbedUrl } from '../../../utils/exerciseVideoResolver';
+import { useAuth } from '../../../context/AuthContext';
 
 const AIWorkoutGenerator = ({ onStartWorkout }) => {
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     gender: 'male',
@@ -27,6 +30,22 @@ const AIWorkoutGenerator = ({ onStartWorkout }) => {
   const [exerciseLibrary, setExerciseLibrary] = useState([]);
   const [selectedVideoUrl, setSelectedVideoUrl] = useState(null);
 
+  // Pre-fill user metrics from AuthContext if available
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        age: user.age ? String(user.age) : prev.age,
+        gender: user.gender || prev.gender,
+        height: user.height ? String(user.height) : prev.height,
+        weight: user.weight ? String(user.weight) : prev.weight,
+        goal: user.fitnessGoal ? user.fitnessGoal.toLowerCase().replace(/\s+/g, '_') : prev.goal,
+        equipment: user.workoutLocation || prev.equipment,
+        workoutDays: user.workoutDays ? String(user.workoutDays) : prev.workoutDays
+      }));
+    }
+  }, [user]);
+
   useEffect(() => {
     const fetchLibrary = async () => {
       try {
@@ -42,14 +61,7 @@ const AIWorkoutGenerator = ({ onStartWorkout }) => {
   }, []);
 
   const getMatchVideo = (name) => {
-    if (!name || !exerciseLibrary.length) return null;
-    const match = exerciseLibrary.find(libEx => 
-      libEx.exerciseName.toLowerCase().replace(/[^a-z0-9]/g, '') === 
-      name.toLowerCase().replace(/[^a-z0-9]/g, '') ||
-      libEx.exerciseName.toLowerCase().includes(name.toLowerCase()) ||
-      name.toLowerCase().includes(libEx.exerciseName.toLowerCase())
-    );
-    return match ? match.videoUrl : null;
+    return resolveExerciseVideo(name, exerciseLibrary);
   };
 
   // Load active plan if exists
@@ -161,7 +173,7 @@ const AIWorkoutGenerator = ({ onStartWorkout }) => {
           reps: String(ex.reps) || '10-12',
           weight: 0,
           restTime: restSeconds,
-          videoUrl: match ? match.videoUrl : 'https://www.youtube.com/embed/IODxDxX7oi4', // Fallback to pushup
+          videoUrl: resolveExerciseVideo(ex.exerciseName, exerciseLibrary),
           imageUrl: match ? match.imageUrl : 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=800&q=80',
           instructions: match ? match.instructions : ['Perform with slow and controlled form.'],
           tips: match ? match.tips : ['Keep core tight'],
@@ -176,6 +188,15 @@ const AIWorkoutGenerator = ({ onStartWorkout }) => {
     } else {
       toast.error("Unable to start workout player.");
     }
+  };
+
+  const getGoalInfo = (goalKey) => {
+    const key = String(goalKey || formData.goal || '').toLowerCase();
+    if (key.includes('muscle')) return { label: 'Muscle Gain (Hypertrophy)', color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' };
+    if (key.includes('weight') || key.includes('loss') || key.includes('fat')) return { label: 'Weight Loss (Fat Burn)', color: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20' };
+    if (key.includes('endurance')) return { label: 'Endurance & Stamina', color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20' };
+    if (key.includes('flexibility')) return { label: 'Flexibility & Mobility', color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20' };
+    return { label: 'General Fitness', color: 'bg-primary-500/10 text-primary-600 dark:text-primary-400 border-primary-500/20' };
   };
 
   return (
@@ -204,9 +225,9 @@ const AIWorkoutGenerator = ({ onStartWorkout }) => {
               <FaRobot size={40} className="text-primary-500 animate-bounce" />
             </div>
             <div>
-              <h3 className="text-2xl font-black tracking-wide uppercase">AI Coach Is Calculating...</h3>
+              <h3 className="text-2xl font-black tracking-wide uppercase">AI Personal Coach Is Calculating...</h3>
               <p className="text-slate-400 text-sm font-semibold max-w-sm mx-auto mt-2 leading-relaxed">
-                Structuring splits, adjusting load progression, calculating optimal rest times, and setting warm-ups...
+                Analyzing your {formData.goal === 'muscle_gain' ? 'Muscle Gain (Hypertrophy)' : formData.goal === 'weight_loss' ? 'Weight Loss & Fat Burn' : 'Fitness'} goal, custom equipment ({formData.equipment}), and {formData.workoutDays}-day split...
               </p>
             </div>
           </motion.div>
@@ -220,13 +241,23 @@ const AIWorkoutGenerator = ({ onStartWorkout }) => {
           >
             {/* Split Schedule */}
             <div className="lg:col-span-8 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-6 sm:p-8 shadow-sm space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
-                <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase flex items-center gap-2">
-                  <FaCalendarAlt className="text-primary-500" /> Weekly Workout Split
-                </h3>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase flex items-center gap-2">
+                    <FaCalendarAlt className="text-primary-500" /> Weekly Workout Split
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    <span className={`px-3 py-1 text-[11px] font-black uppercase rounded-lg border ${getGoalInfo(generatedPlan.goal || formData.goal).color}`}>
+                      🎯 Goal: {getGoalInfo(generatedPlan.goal || formData.goal).label}
+                    </span>
+                    <span className="px-3 py-1 text-[11px] font-black uppercase rounded-lg border bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700">
+                      🛠️ {generatedPlan.equipment || formData.equipment}
+                    </span>
+                  </div>
+                </div>
                 <button
                   onClick={() => setGeneratedPlan(null)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-white font-extrabold text-xs rounded-xl transition-all cursor-pointer"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-white font-extrabold text-xs rounded-xl transition-all cursor-pointer shrink-0"
                 >
                   Generate New Plan
                 </button>
@@ -234,19 +265,27 @@ const AIWorkoutGenerator = ({ onStartWorkout }) => {
 
               {/* Day selection tabs */}
               <div className="flex flex-wrap gap-2">
-                {Object.keys(generatedPlan.weeklySplit).map((day) => (
-                  <button
-                    key={day}
-                    onClick={() => setActiveDay(day)}
-                    className={`px-5 py-2.5 rounded-xl font-extrabold text-xs transition-all uppercase cursor-pointer ${
-                      activeDay === day
-                        ? 'bg-primary-600 text-white shadow-md shadow-primary-500/20'
-                        : 'bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 text-slate-600 dark:text-slate-400'
-                    }`}
-                  >
-                    {day}
-                  </button>
-                ))}
+                {Object.keys(generatedPlan.weeklySplit).map((day) => {
+                  const hasExercises = generatedPlan.weeklySplit[day] && generatedPlan.weeklySplit[day].length > 0;
+                  return (
+                    <button
+                      key={day}
+                      onClick={() => setActiveDay(day)}
+                      className={`px-5 py-2.5 rounded-xl font-extrabold text-xs transition-all uppercase cursor-pointer flex items-center gap-1.5 ${
+                        activeDay === day
+                          ? 'bg-primary-600 text-white shadow-md shadow-primary-500/20'
+                          : 'bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 text-slate-600 dark:text-slate-400'
+                      }`}
+                    >
+                      {day}
+                      {hasExercises ? (
+                        <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      ) : (
+                        <span className="text-[10px] opacity-60">Rest</span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Exercises for selected day */}
@@ -262,20 +301,18 @@ const AIWorkoutGenerator = ({ onStartWorkout }) => {
                           {idx + 1}
                         </div>
                         <div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <h4 className="font-extrabold text-slate-900 dark:text-white uppercase text-base">{ex.exerciseName}</h4>
-                            {getMatchVideo(ex.exerciseName) && (
-                              <button
-                                type="button"
-                                onClick={() => setSelectedVideoUrl(getMatchVideo(ex.exerciseName))}
-                                className="p-1.5 text-primary-600 hover:text-white bg-primary-100 hover:bg-primary-600 dark:bg-primary-950/40 dark:hover:bg-primary-650 rounded-lg transition-all cursor-pointer flex items-center justify-center shrink-0"
-                                title="Watch Demo Video"
-                              >
-                                <FaPlay size={8} />
-                              </button>
-                            )}
+                            <button
+                              type="button"
+                              onClick={() => setSelectedVideoUrl(resolveExerciseVideo(ex.exerciseName, exerciseLibrary))}
+                              className="px-2.5 py-1 text-[11px] font-extrabold text-primary-600 dark:text-primary-300 hover:text-white bg-primary-100 hover:bg-primary-600 dark:bg-primary-950/50 dark:hover:bg-primary-600 rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 border border-primary-500/20 shadow-sm"
+                              title="Watch Demo Video"
+                            >
+                              <FaPlay size={8} /> Demo Video
+                            </button>
                           </div>
-                          <p className="text-slate-400 dark:text-slate-500 text-xs font-bold mt-0.5">Rest Time: {ex.rest || '90 sec'}</p>
+                          <p className="text-slate-400 dark:text-slate-500 text-xs font-bold mt-0.5">Rest Time: {ex.rest || '60 sec'}</p>
                         </div>
                       </div>
                       <div className="flex gap-3 text-xs font-bold text-slate-700 dark:text-slate-300">
@@ -289,8 +326,10 @@ const AIWorkoutGenerator = ({ onStartWorkout }) => {
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-8 text-slate-400 dark:text-slate-500 font-bold uppercase text-xs">
-                    Rest Day / Active Recovery 🧘
+                  <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/30 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
+                    <span className="text-2xl block mb-2">🧘</span>
+                    <h4 className="text-sm font-black text-slate-700 dark:text-slate-300 uppercase">Rest & Active Recovery Day</h4>
+                    <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto font-medium">Focus on hydration, sleep, light stretching, and proper nutrition today.</p>
                   </div>
                 )}
               </div>
@@ -342,7 +381,7 @@ const AIWorkoutGenerator = ({ onStartWorkout }) => {
               </div>
 
               {/* Motivation */}
-              <div className="bg-gradient-to-r from-primary-500 to-indigo-500 rounded-[2rem] p-6 text-white space-y-2">
+              <div className="bg-gradient-to-r from-primary-500 to-indigo-500 rounded-[2rem] p-6 text-white space-y-2 shadow-lg shadow-primary-500/10">
                 <span className="text-[10px] font-black uppercase tracking-widest text-primary-200">Coach Motivation</span>
                 <p className="text-sm font-black italic">"{generatedPlan.motivation}"</p>
               </div>
@@ -394,22 +433,22 @@ const AIWorkoutGenerator = ({ onStartWorkout }) => {
                   <div className="space-y-4">
                     <div>
                       <label className="text-xs font-bold text-slate-500 uppercase block mb-1">Fitness Goal</label>
-                      <select name="goal" value={formData.goal} onChange={handleChange} className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 text-slate-900 dark:text-white">
-                        <option value="muscle_gain">Muscle Gain</option>
-                        <option value="weight_loss">Weight Loss</option>
-                        <option value="endurance">Endurance</option>
-                        <option value="flexibility">Flexibility</option>
-                        <option value="general_fitness">General Fitness</option>
+                      <select name="goal" value={formData.goal} onChange={handleChange} className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 text-slate-900 dark:text-white font-bold">
+                        <option value="muscle_gain">💪 Muscle Gain (Build Hypertrophy & Strength)</option>
+                        <option value="weight_loss">🔥 Weight Loss (Fat Burn & HIIT Circuits)</option>
+                        <option value="endurance">🏃 Endurance & Stamina</option>
+                        <option value="flexibility">🧘 Flexibility & Mobility</option>
+                        <option value="general_fitness">⚡ General Fitness</option>
                       </select>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="text-xs font-bold text-slate-500 uppercase block mb-1">Weekly Days</label>
                         <select name="workoutDays" value={formData.workoutDays} onChange={handleChange} className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 text-slate-900 dark:text-white">
-                          <option value="3">3 Days</option>
-                          <option value="4">4 Days</option>
-                          <option value="5">5 Days</option>
-                          <option value="6">6 Days</option>
+                          <option value="3">3 Days / week</option>
+                          <option value="4">4 Days / week</option>
+                          <option value="5">5 Days / week</option>
+                          <option value="6">6 Days / week</option>
                         </select>
                       </div>
                       <div>
@@ -503,9 +542,10 @@ const AIWorkoutGenerator = ({ onStartWorkout }) => {
             </div>
             <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-slate-100 dark:border-slate-800">
               <iframe
-                src={selectedVideoUrl}
-                title="Exercise Demo"
+                src={formatEmbedUrl(selectedVideoUrl)}
+                title="Exercise Demo Video"
                 className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 frameBorder="0"
               ></iframe>

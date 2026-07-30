@@ -108,12 +108,12 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             
-            <Link to="/" className="flex items-center gap-2 group shrink-0">
-              <div className="w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center transition-transform group-hover:scale-105 shadow-lg shadow-primary-500/20">
-                <FaDumbbell className="text-white text-xl" />
+            <Link to="/" className="flex items-center gap-2.5 group shrink-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-primary-600 to-violet-600 flex items-center justify-center transition-transform group-hover:scale-105 shadow-md shadow-primary-500/20 shrink-0">
+                <FaDumbbell className="text-white text-lg sm:text-xl" />
               </div>
-              <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                FitVerse AI
+              <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                FitVerse <span className="text-primary-500">AI</span>
               </span>
             </Link>
 

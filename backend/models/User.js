@@ -40,6 +40,16 @@ var crypto = require("crypto");
             createdAt: { type: Date, default: Date.now }
           }
         ],
+        notificationSettings: {
+          workoutReminder: { type: Boolean, default: true },
+          dietReminder: { type: Boolean, default: true },
+          trainerReminder: { type: Boolean, default: true },
+          aiNotifications: { type: Boolean, default: true },
+          emailNotifications: { type: Boolean, default: true },
+          pushNotifications: { type: Boolean, default: true },
+          quietHoursStart: { type: String, default: "22:00" },
+          quietHoursEnd: { type: String, default: "07:00" }
+        },
         isActive: { type: Boolean, default: true },
         resetPasswordToken: String,
         resetPasswordExpire: Date

@@ -91,6 +91,7 @@ function App() {
                   <Route path="bookings" element={<MyBookings />} />
                 </Route>
                 <Route path="notifications" element={<NotificationsPage />} />
+                <Route path="history" element={<Navigate to="/dashboard/workouts?tab=history" replace />} />
               </Route>
 
               {/* Admin Routes */}

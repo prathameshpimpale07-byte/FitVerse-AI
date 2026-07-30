@@ -38,11 +38,9 @@ exports.sendContactEmail = async (req, res) => {
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
       (async () => {
         try {
-          // Use Real Credentials with explicit SMTP options
+          // Use Gmail service configuration for maximum compatibility
           const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
+            service: 'gmail',
             auth: {
               user: process.env.EMAIL_USER.trim(),
               pass: process.env.EMAIL_PASS.trim(),
@@ -52,12 +50,14 @@ exports.sendContactEmail = async (req, res) => {
             }
           });
 
-          // 1. Email to Admin (You) with the user's message
+          const adminEmail = process.env.EMAIL_USER.trim();
+
+          // 1. Email to Admin with the user's message
           const adminMailOptions = {
-            from: `"FitVerse AI" <${process.env.EMAIL_USER}>`,
-            to: process.env.EMAIL_USER, 
+            from: `"FitVerse AI Contact" <${adminEmail}>`,
+            to: adminEmail, 
             replyTo: email, 
-            subject: `🚀 New Inquiry: ${firstName} ${lastName || ''}`,
+            subject: `🚀 New Contact Inquiry: ${fullName}`,
             text: `You have received a new inquiry from ${fullName} (${email}):\n\n${message}`,
             html: `
               <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f5; padding: 40px 20px; min-height: 100vh;">
@@ -98,10 +98,10 @@ exports.sendContactEmail = async (req, res) => {
 
           // 2. Auto-reply to the User
           const userMailOptions = {
-            from: `"FitVerse AI" <${process.env.EMAIL_USER}>`,
+            from: `"FitVerse AI Team" <${adminEmail}>`,
             to: email, 
             subject: 'We have received your message - FitVerse AI',
-            text: `Dear ${firstName},\n\nThank you for reaching out to FitVerse AI.\n\nWe have successfully received your inquiry and our elite support team is currently reviewing it. You can expect a detailed and personalized reply from us shortly (usually within 24 hours).\n\nThank you for choosing the world's smartest AI fitness platform.\n\nBest Regards,\nThe FitVerse AI Team`,
+            text: `Dear ${firstName},\n\nThank you for reaching out to FitVerse AI.\n\nWe have successfully received your inquiry and our support team is reviewing it. You can expect a response from us shortly.\n\nBest Regards,\nThe FitVerse AI Team`,
             html: `
               <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 40px 20px;">
                 <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
@@ -114,15 +114,15 @@ exports.sendContactEmail = async (req, res) => {
                   <div style="padding: 20px 40px 40px 40px;">
                     <h2 style="color: #1e293b; font-size: 22px; margin-bottom: 20px; font-weight: 700;">Hello ${firstName},</h2>
                     <p style="color: #475569; font-size: 16px; line-height: 1.8; margin-bottom: 25px;">
-                      Thank you for reaching out to <strong>FitVerse AI</strong>. We are thrilled to connect with you. This email is to confirm that we have successfully received your inquiry.
+                      Thank you for reaching out to <strong>FitVerse AI</strong>. We have successfully received your inquiry.
                     </p>
                     <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 25px; border-radius: 0 12px 12px 0; margin: 30px 0;">
                       <p style="color: #1e40af; font-size: 16px; line-height: 1.7; margin: 0; font-weight: 500;">
-                        Our dedicated team is currently reviewing your message. We prioritize all inquiries and you can expect a detailed, helpful reply from our experts very shortly.
+                        Our team is currently reviewing your message and you will receive a response shortly.
                       </p>
                     </div>
                     <p style="color: #475569; font-size: 16px; line-height: 1.8; margin-bottom: 40px;">
-                      We appreciate your patience and look forward to assisting you on your journey to peak performance!
+                      Thank you for choosing FitVerse AI!
                     </p>
                     <div style="border-top: 1px solid #f1f5f9; padding-top: 25px;">
                       <p style="color: #0f172a; font-size: 16px; font-weight: 700; margin: 0;">Best Regards,</p>
@@ -141,13 +141,13 @@ exports.sendContactEmail = async (req, res) => {
           // Send both emails
           await transporter.sendMail(adminMailOptions);
           await transporter.sendMail(userMailOptions);
-          console.log(`[Contact] Admin notification and user confirmation sent.`);
+          console.log(`[Contact] Email sent successfully to admin (${adminEmail}) and user (${email}).`);
         } catch (emailErr) {
           console.error('[Contact] Failed to send email:', emailErr.message);
         }
       })();
     } else {
-      console.log('[Contact] No EMAIL_USER/PASS found in .env. Saved to DB.');
+      console.log('[Contact] No EMAIL_USER/PASS found in .env. Message saved to DB only.');
     }
 
   } catch (error) {

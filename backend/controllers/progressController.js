@@ -46,27 +46,54 @@ exports.getProgress = async (req, res, next) => {
         next(error);
       }
     };
-    exports.addProgress = async (req, res, next) => {
-      try {
-        const entry = await Progress.create({ ...req.body, user: req.user._id });
-        res.status(201).json({ success: true, entry });
-      } catch (error) {
-        next(error);
-      }
-    };
-    exports.updateProgress = async (req, res, next) => {
-      try {
-        const entry = await Progress.findOneAndUpdate(
-          { _id: req.params.id, user: req.user._id },
-          req.body,
-          { new: true }
-        );
-        if (!entry) return res.status(404).json({ success: false, message: "Progress entry not found" });
-        res.json({ success: true, entry });
-      } catch (error) {
-        next(error);
-      }
-    };
+exports.addProgress = async (req, res, next) => {
+  try {
+    const entry = await Progress.create({ ...req.body, user: req.user._id });
+    
+    // Sync latest weight & height to User profile in MongoDB
+    const updateFields = {};
+    if (req.body.weight && Number(req.body.weight) > 0) {
+      updateFields.weight = Number(req.body.weight);
+    }
+    if (req.body.height && Number(req.body.height) > 0) {
+      updateFields.height = Number(req.body.height);
+    }
+    if (Object.keys(updateFields).length > 0) {
+      await User.findByIdAndUpdate(req.user._id, updateFields);
+    }
+
+    res.status(201).json({ success: true, entry });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateProgress = async (req, res, next) => {
+  try {
+    const entry = await Progress.findOneAndUpdate(
+      { _id: req.params.id, user: req.user._id },
+      req.body,
+      { new: true }
+    );
+    if (!entry) return res.status(404).json({ success: false, message: "Progress entry not found" });
+
+    // Sync weight & height if modified
+    const updateFields = {};
+    if (req.body.weight && Number(req.body.weight) > 0) {
+      updateFields.weight = Number(req.body.weight);
+    }
+    if (req.body.height && Number(req.body.height) > 0) {
+      updateFields.height = Number(req.body.height);
+    }
+    if (Object.keys(updateFields).length > 0) {
+      await User.findByIdAndUpdate(req.user._id, updateFields);
+    }
+
+    res.json({ success: true, entry });
+  } catch (error) {
+    next(error);
+  }
+};
     exports.deleteProgress = async (req, res, next) => {
       try {
         await Progress.findOneAndDelete({ _id: req.params.id, user: req.user._id });

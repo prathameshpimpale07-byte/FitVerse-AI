@@ -299,11 +299,11 @@ const AIDietGenerator = ({ onPlanGenerated }) => {
               <button type="button" onClick={handlePrev} className="flex-1 py-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer" disabled={loading}>
                 Back
               </button>
-              <button type="submit" className="flex-1 py-4 bg-emerald-650 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer" disabled={loading}>
+              <button type="submit" className="flex-1 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 cursor-pointer" disabled={loading}>
                 {loading ? (
                   <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin"></div>
                 ) : (
-                  <>Create Diet Plan &rarr;</>
+                  <>🥗 Generate AI Diet Plan &rarr;</>
                 )}
               </button>
             </div>

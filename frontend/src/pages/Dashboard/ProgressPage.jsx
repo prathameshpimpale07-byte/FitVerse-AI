@@ -8,7 +8,7 @@ import {
 import { Line } from 'react-chartjs-2';
 import {
   FaPlus, FaBrain, FaChartLine, FaTrash,
-  FaWeight, FaFire, FaTint, FaDumbbell
+  FaWeight, FaFire, FaTint, FaDumbbell, FaHeartbeat, FaCheckCircle
 } from 'react-icons/fa';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
@@ -41,6 +41,137 @@ const Field = ({ label, name, value, onChange, placeholder, step = '0.1', accent
     />
   </div>
 );
+
+// ── Interactive BMI Calculator & Gauge Widget
+const BMICalculatorWidget = ({ user, latestWeight }) => {
+  const [height, setHeight] = useState(user?.height || 175);
+  const [weight, setWeight] = useState(latestWeight || user?.weight || 70);
+
+  useEffect(() => {
+    if (user?.height) setHeight(user.height);
+    if (latestWeight || user?.weight) setWeight(latestWeight || user.weight);
+  }, [user, latestWeight]);
+
+  const hMeter = height / 100;
+  const bmiVal = (hMeter > 0 && weight > 0) ? (weight / (hMeter * hMeter)).toFixed(1) : 0;
+
+  let category = 'Normal';
+  let colorClass = 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20';
+  let progressPercent = 0;
+
+  if (bmiVal < 18.5) {
+    category = 'Underweight';
+    colorClass = 'text-sky-500 bg-sky-500/10 border-sky-500/20';
+    progressPercent = Math.min((bmiVal / 18.5) * 25, 25);
+  } else if (bmiVal >= 18.5 && bmiVal < 25) {
+    category = 'Normal Weight';
+    colorClass = 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20';
+    progressPercent = 25 + ((bmiVal - 18.5) / 6.5) * 25;
+  } else if (bmiVal >= 25 && bmiVal < 30) {
+    category = 'Overweight';
+    colorClass = 'text-amber-500 bg-amber-500/10 border-amber-500/20';
+    progressPercent = 50 + ((bmiVal - 25) / 5) * 25;
+  } else if (bmiVal >= 30) {
+    category = 'Obese';
+    colorClass = 'text-red-500 bg-red-500/10 border-red-500/20';
+    progressPercent = Math.min(75 + ((bmiVal - 30) / 10) * 25, 100);
+  }
+
+  const minIdealWeight = (18.5 * hMeter * hMeter).toFixed(1);
+  const maxIdealWeight = (24.9 * hMeter * hMeter).toFixed(1);
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+      <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+        <h3 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+          <FaHeartbeat className="text-violet-500" /> Interactive BMI Calculator & Health Assessment
+        </h3>
+        <span className={`px-3 py-1 text-xs font-black uppercase rounded-full border ${colorClass}`}>
+          {category}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+        {/* Sliders & Inputs */}
+        <div className="space-y-5">
+          <div>
+            <div className="flex justify-between text-xs font-black uppercase tracking-wider text-slate-500 mb-1">
+              <span>Height (cm)</span>
+              <div className="flex items-center gap-2">
+                <input 
+                  type="number" value={height} onChange={(e) => setHeight(Number(e.target.value))}
+                  className="w-16 px-2 py-0.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold text-xs rounded-lg text-right"
+                />
+                <span className="text-slate-900 dark:text-white font-bold">cm</span>
+              </div>
+            </div>
+            <input 
+              type="range" min="120" max="220" value={height} 
+              onChange={(e) => setHeight(Number(e.target.value))}
+              className="w-full accent-violet-600 cursor-pointer h-2 bg-slate-100 dark:bg-slate-800 rounded-lg"
+            />
+          </div>
+
+          <div>
+            <div className="flex justify-between text-xs font-black uppercase tracking-wider text-slate-500 mb-1">
+              <span>Weight (kg)</span>
+              <div className="flex items-center gap-2">
+                <input 
+                  type="number" step="0.5" value={weight} onChange={(e) => setWeight(Number(e.target.value))}
+                  className="w-16 px-2 py-0.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold text-xs rounded-lg text-right"
+                />
+                <span className="text-slate-900 dark:text-white font-bold">kg</span>
+              </div>
+            </div>
+            <input 
+              type="range" min="30" max="180" value={weight} step="0.5"
+              onChange={(e) => setWeight(Number(e.target.value))}
+              className="w-full accent-violet-600 cursor-pointer h-2 bg-slate-100 dark:bg-slate-800 rounded-lg"
+            />
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-xs font-medium text-slate-600 dark:text-slate-400 flex items-center justify-between">
+            <div>
+              <span className="font-bold text-slate-900 dark:text-white block mb-0.5">Healthy Weight Range:</span>
+              <span className="text-violet-600 dark:text-violet-400 font-extrabold text-sm">{minIdealWeight} kg — {maxIdealWeight} kg</span>
+            </div>
+            <span className="text-[10px] font-extrabold text-slate-400 uppercase">For {height}cm</span>
+          </div>
+        </div>
+
+        {/* BMI Meter Display */}
+        <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 text-center space-y-4">
+          <div>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Your Calculated BMI</span>
+            <span className="text-5xl font-black text-slate-900 dark:text-white">{bmiVal}</span>
+          </div>
+
+          {/* Scale Indicator */}
+          <div className="space-y-2">
+            <div className="w-full h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden flex relative">
+              <div className="w-1/4 bg-sky-400" title="Underweight (< 18.5)"></div>
+              <div className="w-1/4 bg-emerald-500" title="Normal (18.5 - 24.9)"></div>
+              <div className="w-1/4 bg-amber-500" title="Overweight (25 - 29.9)"></div>
+              <div className="w-1/4 bg-red-500" title="Obese (30+)"></div>
+              
+              {/* Pointer indicator */}
+              <div 
+                className="absolute top-0 bottom-0 w-2 bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-white rounded-full transition-all duration-300 shadow-md"
+                style={{ left: `calc(${progressPercent}% - 4px)` }}
+              />
+            </div>
+            <div className="grid grid-cols-4 text-[9px] font-black uppercase text-slate-400 tracking-wider text-center">
+              <span className="text-sky-500">&lt;18.5</span>
+              <span className="text-emerald-500">18.5-24.9</span>
+              <span className="text-amber-500">25-29.9</span>
+              <span className="text-red-500">&gt;30</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 const ProgressPage = () => {
   const { user } = useAuth();
@@ -166,7 +297,6 @@ const ProgressPage = () => {
   };
 
   const latestLog = logs[logs.length - 1];
-  const prevLog = logs[logs.length - 2];
 
   return (
     <div className="max-w-3xl mx-auto pb-16 space-y-8">
@@ -177,12 +307,15 @@ const ProgressPage = () => {
           <span className="w-9 h-9 bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 rounded-xl flex items-center justify-center text-base">
             <FaChartLine />
           </span>
-          Progress Tracker
+          Progress Tracker & Health Analytics
         </h1>
         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1.5 font-medium">
-          Log your metrics, view trends and get AI coaching.
+          Log your metrics, calculate your exact BMI, view progress trends and receive AI coaching.
         </p>
       </div>
+
+      {/* ─────────── BMI CALCULATOR WIDGET ─────────── */}
+      <BMICalculatorWidget user={user} latestWeight={latestLog?.weight} />
 
       {/* ─────────── 1. LOG FORM ─────────── */}
       <motion.section
@@ -238,11 +371,11 @@ const ProgressPage = () => {
           {/* Actions */}
           <div className="flex items-center justify-between pt-1">
             <button type="button" onClick={() => setFormData(EMPTY_FORM)}
-              className="text-sm font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+              className="text-sm font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer">
               Clear
             </button>
             <button type="submit" disabled={submitting}
-              className="flex items-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 bg-violet-600 hover:bg-violet-700 text-white text-sm font-black rounded-2xl shadow-lg shadow-violet-500/20 transition-all disabled:opacity-50">
+              className="flex items-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 bg-violet-600 hover:bg-violet-700 text-white text-sm font-black rounded-2xl shadow-lg shadow-violet-500/20 transition-all disabled:opacity-50 cursor-pointer">
               {submitting
                 ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
                 : <><FaPlus size={11} /> Save Log</>
@@ -263,7 +396,7 @@ const ProgressPage = () => {
             {[
               { icon: <FaWeight />, label: 'Current Weight', value: latestLog?.weight ? `${latestLog.weight} kg` : '—', color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-500/10' },
               { icon: <FaChartLine />, label: 'Body Fat', value: latestLog?.bodyFat ? `${latestLog.bodyFat}%` : '—', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10' },
-              { icon: <FaDumbbell />, label: 'BMI', value: calcBMI(latestLog?.weight) || '—', color: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-50 dark:bg-sky-500/10' },
+              { icon: <FaDumbbell />, label: 'BMI Score', value: calcBMI(latestLog?.weight) || '—', color: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-50 dark:bg-sky-500/10' },
               { icon: <FaFire />, label: 'Calories (last)', value: latestLog?.caloriesBurned ? `${latestLog.caloriesBurned} kcal` : '—', color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-500/10' },
             ].map((s, i) => (
               <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 sm:p-4 flex items-center gap-2.5 sm:gap-3">
@@ -405,7 +538,7 @@ const ProgressPage = () => {
               <button
                 onClick={handleAI}
                 disabled={logs.length === 0}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-sm font-black rounded-2xl shadow-lg shadow-indigo-500/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-sm font-black rounded-2xl shadow-lg shadow-indigo-500/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
               >
                 <FaBrain size={13} /> Generate AI Report
               </button>
@@ -440,7 +573,7 @@ const ProgressPage = () => {
               </div>
               <div className="flex items-center justify-between">
                 <p className="text-xs text-slate-400 font-medium">Report generated just now</p>
-                <button onClick={handleAI} className="text-xs font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 transition-colors">
+                <button onClick={handleAI} className="text-xs font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 transition-colors cursor-pointer">
                   ↺ Regenerate
                 </button>
               </div>

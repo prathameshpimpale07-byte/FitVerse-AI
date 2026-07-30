@@ -4,14 +4,58 @@ import api from '../../../services/api';
 import toast from 'react-hot-toast';
 import RecipeDetailsModal from './RecipeDetailsModal';
 
-const MyDietPlan = ({ plan, onRegenerate, onMealLogged }) => {
+const MEAL_IMAGE_MAP = {
+  oats: "https://images.unsplash.com/photo-1517673400267-0251440c45dc?w=800&auto=format&fit=crop&q=80",
+  oatmeal: "https://images.unsplash.com/photo-1517673400267-0251440c45dc?w=800&auto=format&fit=crop&q=80",
+  pancake: "https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=800&auto=format&fit=crop&q=80",
+  egg: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&auto=format&fit=crop&q=80",
+  omelet: "https://images.unsplash.com/photo-1510693206972-df098062cb71?w=800&auto=format&fit=crop&q=80",
+  chicken: "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=800&auto=format&fit=crop&q=80",
+  salad: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&auto=format&fit=crop&q=80",
+  rice: "https://images.unsplash.com/photo-1516714435131-44d6b64dc6a2?w=800&auto=format&fit=crop&q=80",
+  paneer: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&auto=format&fit=crop&q=80",
+  fish: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800&auto=format&fit=crop&q=80",
+  salmon: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&auto=format&fit=crop&q=80",
+  smoothie: "https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=800&auto=format&fit=crop&q=80",
+  shake: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=800&auto=format&fit=crop&q=80",
+  yogurt: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=800&auto=format&fit=crop&q=80",
+  fruit: "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=800&auto=format&fit=crop&q=80",
+  banana: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=800&auto=format&fit=crop&q=80",
+  apple: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=800&auto=format&fit=crop&q=80",
+  nuts: "https://images.unsplash.com/photo-1536591375315-1b836802e3a1?w=800&auto=format&fit=crop&q=80",
+  almond: "https://images.unsplash.com/photo-1508061252966-177209772a80?w=800&auto=format&fit=crop&q=80",
+  bread: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=80",
+  toast: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&auto=format&fit=crop&q=80",
+  soup: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&auto=format&fit=crop&q=80",
+  curry: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&auto=format&fit=crop&q=80",
+  roti: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&auto=format&fit=crop&q=80",
+  dal: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800&auto=format&fit=crop&q=80"
+};
+
+const resolveFoodImage = (mealName, foodsArray, existingUrl) => {
+  if (existingUrl && existingUrl.startsWith('http') && !existingUrl.includes('loremflickr')) {
+    return existingUrl;
+  }
+  const text = ((mealName || '') + ' ' + (foodsArray ? foodsArray.join(' ') : '')).toLowerCase();
+  for (const [key, url] of Object.entries(MEAL_IMAGE_MAP)) {
+    if (text.includes(key)) {
+      return url;
+    }
+  }
+  return "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=800&auto=format&fit=crop&q=80";
+};
+
+const MyDietPlan = ({ plan, activeDay: propActiveDay, setActiveDay: propSetActiveDay, onRegenerate, onMealLogged }) => {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [completedMeals, setCompletedMeals] = useState({}); // format: { 'Breakfast': 'Completed' }
   const [swappingMeal, setSwappingMeal] = useState(null);
   const [alternatives, setAlternatives] = useState([]);
   const [loadingAlts, setLoadingAlts] = useState(false);
   const [swapping, setSwapping] = useState(false);
-  const [activeDay, setActiveDay] = useState(1);
+  const [internalActiveDay, setInternalActiveDay] = useState(1);
+
+  const activeDay = propActiveDay !== undefined ? propActiveDay : internalActiveDay;
+  const setActiveDay = propSetActiveDay || setInternalActiveDay;
 
   const hasDailyPlans = plan && plan.dailyPlans && plan.dailyPlans.length > 0;
   const currentMeals = hasDailyPlans 
@@ -30,14 +74,18 @@ const MyDietPlan = ({ plan, onRegenerate, onMealLogged }) => {
   useEffect(() => {
     if (plan && plan.completedMealsLog) {
       const today = getTodayDateStr();
-      const logsToday = plan.completedMealsLog.filter(log => log.date === today);
+      const logsToday = plan.completedMealsLog.filter(
+        log => log.date === today && (log.dayNumber || 1) === activeDay
+      );
       const mealsMap = {};
       logsToday.forEach(log => {
         mealsMap[log.meal] = log.status;
       });
       setCompletedMeals(mealsMap);
+    } else {
+      setCompletedMeals({});
     }
-  }, [plan]);
+  }, [plan, activeDay]);
 
   const handleToggleMeal = async (mealName, currentStatus) => {
     const today = getTodayDateStr();
@@ -50,7 +98,8 @@ const MyDietPlan = ({ plan, onRegenerate, onMealLogged }) => {
       const res = await api.post('/diets/complete-meal', {
         date: today,
         meal: mealName,
-        status: newStatus
+        status: newStatus,
+        dayNumber: activeDay
       });
       if (res.success) {
         setCompletedMeals(prev => ({ ...prev, [mealName]: newStatus }));
@@ -60,6 +109,24 @@ const MyDietPlan = ({ plan, onRegenerate, onMealLogged }) => {
     } catch (err) {
       console.error(err);
       toast.error("Failed to update meal status");
+    }
+  };
+
+  const handleResetDayProgress = async () => {
+    const today = getTodayDateStr();
+    try {
+      const res = await api.post('/diets/reset-day-progress', {
+        date: today,
+        dayNumber: activeDay
+      });
+      if (res.success) {
+        setCompletedMeals({});
+        toast.success(`Reset progress for Day ${activeDay}`);
+        if (onMealLogged) onMealLogged(res.plan);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to reset day progress");
     }
   };
 
@@ -73,7 +140,7 @@ const MyDietPlan = ({ plan, onRegenerate, onMealLogged }) => {
       fat: meal.fat || 0,
       servingSize: '1 serving',
       prepTime: meal.prepTime || 15,
-      imageUrl: meal.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+      imageUrl: resolveFoodImage(meal.meal, meal.foods, meal.imageUrl),
       recipe: meal.recipe ? [meal.recipe] : ['Enjoy the fresh meal combinations.'],
       alternativeFoods: ['Fruit Salad', 'Boiled Eggs']
     };
@@ -139,23 +206,32 @@ const MyDietPlan = ({ plan, onRegenerate, onMealLogged }) => {
           <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold">Track and check off your completed meals throughout the day</p>
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* Progress Ring */}
-          <div className="relative w-20 h-20 flex items-center justify-center shrink-0">
-            <svg className="w-full h-full transform -rotate-90">
-              <circle cx="40" cy="40" r="34" className="stroke-slate-200 dark:stroke-slate-800" strokeWidth="6" fill="transparent" />
-              <circle cx="40" cy="40" r="34" className="stroke-emerald-500 transition-all duration-500" strokeWidth="6" fill="transparent"
-                strokeDasharray={2 * Math.PI * 34}
-                strokeDashoffset={(2 * Math.PI * 34) * (1 - completionPercentage / 100)}
-              />
-            </svg>
-            <span className="absolute font-black text-sm text-slate-800 dark:text-white">{completionPercentage}%</span>
+          <div className="flex items-center gap-4">
+            {/* Progress Ring */}
+            <div className="relative w-20 h-20 flex items-center justify-center shrink-0">
+              <svg className="w-full h-full transform -rotate-90">
+                <circle cx="40" cy="40" r="34" className="stroke-slate-200 dark:stroke-slate-800" strokeWidth="6" fill="transparent" />
+                <circle cx="40" cy="40" r="34" className="stroke-emerald-500 transition-all duration-500" strokeWidth="6" fill="transparent"
+                  strokeDasharray={2 * Math.PI * 34}
+                  strokeDashoffset={(2 * Math.PI * 34) * (1 - completionPercentage / 100)}
+                />
+              </svg>
+              <span className="absolute font-black text-sm text-slate-800 dark:text-white">{completionPercentage}%</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] text-slate-450 block font-bold uppercase">Meals Checklist</span>
+              <span className="text-slate-900 dark:text-white font-extrabold text-sm">{completedCount} of {totalMealsCount} Completed</span>
+              {completedCount > 0 && (
+                <button
+                  onClick={handleResetDayProgress}
+                  className="mt-1 flex items-center gap-1 text-[10px] font-black text-slate-400 hover:text-red-500 transition-colors uppercase tracking-wider cursor-pointer"
+                  title="Reset completed meals for this day"
+                >
+                  <FaSyncAlt size={9} /> Reset Day Progress
+                </button>
+              )}
+            </div>
           </div>
-          <div>
-            <span className="text-[10px] text-slate-450 block font-bold uppercase">Meals Checklist</span>
-            <span className="text-slate-900 dark:text-white font-extrabold text-sm">{completedCount} of {totalMealsCount} Completed</span>
-          </div>
-        </div>
       </div>
 
       {/* Day Tabs */}
@@ -195,17 +271,14 @@ const MyDietPlan = ({ plan, onRegenerate, onMealLogged }) => {
                 <div>
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-start gap-3">
-                      {m.imageUrl ? (
-                        <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 shadow-sm border border-slate-200 dark:border-slate-700">
-                          <img src={m.imageUrl} alt={m.meal} className="w-full h-full object-cover" />
-                        </div>
-                      ) : (
-                        <span className={`p-3 rounded-xl shrink-0 ${
-                          status === 'Completed' ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-50 dark:bg-slate-800 text-slate-400'
-                        }`}>
-                          <FaUtensils size={16} />
-                        </span>
-                      )}
+                      {(() => {
+                        const foodImgSrc = resolveFoodImage(m.meal, m.foods, m.imageUrl);
+                        return (
+                          <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 shadow-sm border border-slate-200 dark:border-slate-700">
+                            <img src={foodImgSrc} alt={m.meal} className="w-full h-full object-cover" />
+                          </div>
+                        );
+                      })()}
                       
                       <div>
                         <h4 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-wide">

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaHeart, FaDumbbell, FaFire, FaClock, FaPlay } from 'react-icons/fa';
 import api from '../../../services/api';
 import toast from 'react-hot-toast';
+import { resolveExerciseVideo, formatEmbedUrl } from '../../../utils/exerciseVideoResolver';
 
 const getEmbedUrl = (url) => {
   if (!url) return '';
@@ -122,19 +123,17 @@ const Favorites = ({ onSelectExercise }) => {
                     <FaHeart className="text-lg text-red-500" />
                   </button>
 
-                  {/* Play Button */}
-                  {ex.videoUrl && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedVideoUrl(ex.videoUrl);
-                      }}
-                      className="absolute top-4 right-16 w-10 h-10 bg-white dark:bg-slate-900 rounded-full flex items-center justify-center text-primary-500 hover:scale-110 hover:text-white hover:bg-primary-600 shadow-sm transition-all border border-slate-100 dark:border-slate-800 cursor-pointer"
-                      title="Watch Video"
-                    >
-                      <FaPlay size={10} className="ml-0.5" />
-                    </button>
-                  )}
+                  {/* Play Button - Always available */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedVideoUrl(resolveExerciseVideo(ex.exerciseName, [ex]));
+                    }}
+                    className="absolute top-4 right-16 w-10 h-10 bg-white dark:bg-slate-900 rounded-full flex items-center justify-center text-primary-500 hover:scale-110 hover:text-white hover:bg-primary-600 shadow-sm transition-all border border-slate-100 dark:border-slate-800 cursor-pointer"
+                    title="Watch Demo Video"
+                  >
+                    <FaPlay size={10} className="ml-0.5" />
+                  </button>
                 </div>
 
                 {/* Details */}
@@ -161,10 +160,14 @@ const Favorites = ({ onSelectExercise }) => {
           </AnimatePresence>
         </div>
       ) : (
-        <div className="text-center py-20 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem]">
-          <FaHeart size={48} className="mx-auto text-slate-200 dark:text-slate-700 mb-4" />
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No favorites yet</h3>
-          <p className="text-slate-500 dark:text-slate-400">Save exercises to your favorites to see them listed here.</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-12 text-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center text-2xl mx-auto">
+            <FaHeart />
+          </div>
+          <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase">No Favorite Exercises Saved</h3>
+          <p className="text-slate-400 text-xs font-semibold max-w-sm mx-auto">
+            Browse the Exercise Library or AI Workout Generator and click the heart icon to save your favorite movements!
+          </p>
         </div>
       )}
 
@@ -183,9 +186,10 @@ const Favorites = ({ onSelectExercise }) => {
             </div>
             <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-slate-100 dark:border-slate-800">
               <iframe
-                src={getEmbedUrl(selectedVideoUrl)}
-                title="Exercise Demo"
+                src={formatEmbedUrl(selectedVideoUrl)}
+                title="Exercise Demo Video"
                 className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 frameBorder="0"
               ></iframe>

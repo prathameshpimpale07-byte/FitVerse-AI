@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaPaperPlane, FaUserCircle, FaRobot, FaAppleAlt } from 'react-icons/fa';
+import { FaPaperPlane, FaUserCircle, FaRobot, FaAppleAlt, FaExclamationTriangle } from 'react-icons/fa';
 import api from '../../../services/api';
 import toast from 'react-hot-toast';
 
@@ -64,6 +64,8 @@ const AIDietCoach = () => {
       <div className="flex-1 overflow-y-auto sidebar-scroll py-6 space-y-4 pr-1">
         {messages.map((msg, index) => {
           const isUser = msg.role === 'user';
+          const isScopeRefusal = msg.content.includes('Scope Constraint') || msg.content.includes('I can only assist with');
+
           return (
             <div
               key={index}
@@ -77,9 +79,21 @@ const AIDietCoach = () => {
               <div className={`p-4 rounded-3xl text-sm font-medium leading-relaxed ${
                 isUser
                   ? 'bg-emerald-500 text-white rounded-tr-none'
-                  : 'bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-100 dark:border-slate-750 rounded-tl-none'
+                  : isScopeRefusal
+                    ? 'bg-amber-500/10 border border-amber-500/30 text-amber-200 rounded-tl-none'
+                    : 'bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-100 dark:border-slate-750 rounded-tl-none'
               }`}>
-                {msg.content}
+                {isScopeRefusal ? (
+                  <div className="flex items-start gap-2.5">
+                    <FaExclamationTriangle className="text-amber-400 text-base shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-extrabold text-[10px] uppercase tracking-wider text-amber-300">Workout & Diet Scope Only</p>
+                      <p className="mt-1">{msg.content.replace(/⚠️\s*\*\*Scope Constraint\*\*:\s*/, '')}</p>
+                    </div>
+                  </div>
+                ) : (
+                  msg.content
+                )}
               </div>
             </div>
           );

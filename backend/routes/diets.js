@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { 
-  getMyPlan, resetMyPlan, completeMeal, logWater, getFoods, getRecipes,
+  getMyPlan, resetMyPlan, completeMeal, resetDayProgress, logWater, getFoods, getRecipes,
   getDiets, getDiet, createDiet, updateDiet, deleteDiet 
 } = require('../controllers/dietController.js');
 const { protect } = require('../middleware/auth.js');
@@ -15,6 +15,7 @@ router.get("/recipes", getRecipes);
 router.get("/my-plan", protect, getMyPlan);
 router.delete("/my-plan", protect, resetMyPlan);
 router.post("/complete-meal", protect, completeMeal);
+router.post("/reset-day-progress", protect, resetDayProgress);
 router.post("/water", protect, logWater);
 
 // Fallbacks & standard items

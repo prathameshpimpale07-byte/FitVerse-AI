@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaDumbbell, FaFire, FaClock, FaHeart, FaRegHeart, FaArrowLeft, FaFilter, FaPlay } from 'react-icons/fa';
 import api from '../../../services/api';
 import toast from 'react-hot-toast';
+import { resolveExerciseVideo, formatEmbedUrl } from '../../../utils/exerciseVideoResolver';
 
 const getEmbedUrl = (url) => {
   if (!url) return '';
@@ -215,19 +216,17 @@ const ExerciseLibrary = ({ category, onBack, onSelectExercise }) => {
                   {favorites.includes(ex._id) ? <FaHeart className="text-base text-red-500" /> : <FaRegHeart className="text-base text-slate-350" />}
                 </button>
 
-                {/* Play Button */}
-                {ex.videoUrl && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedVideoUrl(ex.videoUrl);
-                    }}
-                    className="absolute top-4 right-16 z-20 w-10 h-10 bg-slate-950/80 backdrop-blur-md rounded-full flex items-center justify-center text-primary-500 hover:scale-110 hover:text-white shadow-sm transition-all border border-white/15 cursor-pointer"
-                    title="Watch Video"
-                  >
-                    <FaPlay size={10} className="ml-0.5" />
-                  </button>
-                )}
+                {/* Play Button - Always available for every exercise */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedVideoUrl(resolveExerciseVideo(ex.exerciseName, [ex]));
+                  }}
+                  className="absolute top-4 right-16 z-20 w-10 h-10 bg-slate-950/80 backdrop-blur-md rounded-full flex items-center justify-center text-primary-500 hover:scale-110 hover:text-white shadow-sm transition-all border border-white/15 cursor-pointer"
+                  title="Watch Demo Video"
+                >
+                  <FaPlay size={10} className="ml-0.5" />
+                </button>
 
                 {/* Card Content */}
                 <div className="relative z-20 p-6 space-y-3 text-white">
@@ -292,9 +291,10 @@ const ExerciseLibrary = ({ category, onBack, onSelectExercise }) => {
             </div>
             <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-slate-100 dark:border-slate-800">
               <iframe
-                src={getEmbedUrl(selectedVideoUrl)}
-                title="Exercise Demo"
+                src={formatEmbedUrl(selectedVideoUrl)}
+                title="Exercise Demo Video"
                 className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 frameBorder="0"
               ></iframe>

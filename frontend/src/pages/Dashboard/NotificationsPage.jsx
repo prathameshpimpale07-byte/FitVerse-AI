@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useNotifications } from '../../context/NotificationContext';
+import api from '../../services/api';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -83,7 +84,7 @@ const DATE_ORDER = ['Today', 'Yesterday', 'This Week', 'Older'];
 // ── Notification Card ─────────────────────────────────────────────────────────
 const NotificationCard = ({ notif, onMarkRead, onDelete }) => {
   const cfg = CATEGORIES[notif.category] || CATEGORIES.System;
-  const priorityCfg = PRIORITY_CONFIG[notif.priority];
+  const priorityCfg = PRIORITY_CONFIG[notif.priority] || PRIORITY_CONFIG.Medium;
 
   return (
     <motion.div
@@ -182,20 +183,52 @@ const NotificationsPage = () => {
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
   const [showSettings, setShowSettings] = useState(false);
+  const [savingSettings, setSavingSettings] = useState(false);
   const [settings, setSettings] = useState({
     workoutReminder: true,
     dietReminder: true,
     trainerReminder: true,
     aiNotifications: true,
-    emailNotifications: false,
+    emailNotifications: true,
     pushNotifications: true,
     quietHoursStart: '22:00',
     quietHoursEnd: '07:00',
   });
 
+  // Load notification settings from backend
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await api.get('/notifications/settings');
+        if (res?.success && res.settings) {
+          setSettings(res.settings);
+        }
+      } catch (err) {
+        console.error('Failed to load notification settings:', err);
+      }
+    };
+    fetchSettings();
+  }, []);
+
   const handleMarkRead = (id) => markAsRead(id);
   const handleMarkAllRead = () => markAllAsRead();
   const handleDelete = (id) => { deleteNotification(id); toast.success('Notification deleted'); };
+
+  const handleSaveSettings = async () => {
+    setSavingSettings(true);
+    try {
+      const res = await api.put('/notifications/settings', settings);
+      if (res?.success) {
+        toast.success('Notification preferences saved!');
+        if (res.settings) setSettings(res.settings);
+        setShowSettings(false);
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to save settings');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
 
   const filtered = useMemo(() => {
     return notifications.filter(n => {
@@ -229,7 +262,7 @@ const NotificationsPage = () => {
               </span>
             )}
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Your personal fitness assistant</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Your personal fitness assistant (Synced with Email 📧)</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {unreadCount > 0 && (
@@ -340,10 +373,11 @@ const NotificationsPage = () => {
                 </div>
               </div>
               <button
-                onClick={() => { toast.success('Settings saved!'); setShowSettings(false); }}
-                className="w-full py-3 bg-primary-600 hover:bg-primary-500 text-white font-black rounded-xl transition-all shadow-lg shadow-primary-500/20"
+                onClick={handleSaveSettings}
+                disabled={savingSettings}
+                className="w-full py-3 bg-primary-600 hover:bg-primary-500 text-white font-black rounded-xl transition-all shadow-lg shadow-primary-500/20 disabled:opacity-50"
               >
-                Save Preferences
+                {savingSettings ? 'Saving Preferences...' : 'Save Preferences'}
               </button>
             </div>
           </motion.div>

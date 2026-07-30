@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 
 const workoutPlanSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  goal: { type: String, default: 'muscle_gain' },
+  equipment: { type: String, default: 'Gym' },
+  workoutDays: { type: Number, default: 6 },
   weeklySplit: { type: mongoose.Schema.Types.Mixed, required: true }, // Monday: [...], Tuesday: [...], etc.
   progressiveOverloadSuggestions: { type: String, default: "" },
   warmUp: { type: String, default: "" },
@@ -12,3 +15,4 @@ const workoutPlanSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 module.exports = mongoose.model('WorkoutPlan', workoutPlanSchema);
+

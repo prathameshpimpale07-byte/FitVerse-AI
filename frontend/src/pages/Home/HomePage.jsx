@@ -830,7 +830,7 @@ const HomePage = () => {
             {/* Dark Mode Glowing Accents */}
             <div className="absolute top-0 right-0 w-72 md:w-[500px] h-72 md:h-[500px] bg-primary-600/20 rounded-full blur-[120px] mix-blend-screen pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-72 md:w-[500px] h-72 md:h-[500px] bg-secondary-600/20 rounded-full blur-[120px] mix-blend-screen pointer-events-none" />
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
+            <div className="absolute inset-0 bg-[url('/noise.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
 
             <div className="flex flex-col lg:flex-row gap-16 items-center relative z-10">
               

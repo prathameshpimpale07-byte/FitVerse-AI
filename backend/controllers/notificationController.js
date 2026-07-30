@@ -1,4 +1,6 @@
 const Notification = require('../models/Notification.js');
+const User = require('../models/User.js');
+const createNotification = require('../utils/createNotification.js');
 
 exports.getNotifications = async (req, res, next) => {
   try {
@@ -45,3 +47,46 @@ exports.deleteNotification = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getNotificationSettings = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id).select('notificationSettings');
+    const defaultSettings = {
+      workoutReminder: true,
+      dietReminder: true,
+      trainerReminder: true,
+      aiNotifications: true,
+      emailNotifications: true,
+      pushNotifications: true,
+      quietHoursStart: '22:00',
+      quietHoursEnd: '07:00',
+    };
+    const settings = { ...defaultSettings, ...(user?.notificationSettings?.toObject() || {}) };
+    res.json({ success: true, settings });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateNotificationSettings = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    user.notificationSettings = {
+      ...(user.notificationSettings?.toObject() || {}),
+      ...req.body,
+    };
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Notification settings updated successfully',
+      settings: user.notificationSettings,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+

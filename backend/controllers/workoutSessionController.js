@@ -1,5 +1,6 @@
 const WorkoutHistory = require('../models/WorkoutHistory');
 const User = require('../models/User');
+const createNotification = require('../utils/createNotification');
 
 exports.startWorkout = async (req, res) => {
   try {
@@ -75,16 +76,54 @@ exports.completeWorkout = async (req, res) => {
       if (user.streak >= 3 && !achievements.includes('Streak Master (3 Days)')) {
         achievements.push('Streak Master (3 Days)');
         user.notifications.push({ message: "🏆 Achievement Unlocked: Streak Master (3 Days)!" });
+        createNotification({
+          userId: user._id,
+          userEmail: user.email,
+          userName: user.name,
+          title: '🏆 Achievement Unlocked!',
+          description: 'Streak Master (3 Days)! You are on fire 🔥 Keep pushing!',
+          category: 'Achievement',
+          priority: 'High',
+          icon: 'FaTrophy',
+          actionUrl: '/dashboard/profile',
+          actionText: 'View Achievements'
+        }).catch(console.error);
       }
       const historyCount = await WorkoutHistory.countDocuments({ userId });
       if (historyCount === 0 && !achievements.includes('First Steps')) {
         achievements.push('First Steps');
         user.notifications.push({ message: "🏆 Achievement Unlocked: Completed your first workout!" });
+        createNotification({
+          userId: user._id,
+          userEmail: user.email,
+          userName: user.name,
+          title: '🏆 Achievement Unlocked!',
+          description: 'First Steps! Completed your first workout on FitVerse AI!',
+          category: 'Achievement',
+          priority: 'High',
+          icon: 'FaTrophy',
+          actionUrl: '/dashboard/profile',
+          actionText: 'View Achievements'
+        }).catch(console.error);
       }
       user.achievements = achievements;
 
       await user.save();
     }
+
+    // Trigger workout completion notification
+    createNotification({
+      userId,
+      userEmail: req.user.email,
+      userName: req.user.name,
+      title: '🏋️ Workout Completed!',
+      description: `Great effort! You finished "${workoutName}" burning ${caloriesBurned} kcal and earning +${xpGained} XP & +${coinsGained} Coins!`,
+      category: 'Workout',
+      priority: 'High',
+      icon: 'FaDumbbell',
+      actionUrl: '/dashboard/workouts?tab=history',
+      actionText: 'View Workout Summary'
+    }).catch(console.error);
 
     res.status(201).json({
       success: true,

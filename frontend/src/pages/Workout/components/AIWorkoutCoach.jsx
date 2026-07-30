@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaRobot, FaPaperPlane, FaTrash, FaUser, FaDumbbell, FaAppleAlt, FaHeartbeat, FaBolt } from 'react-icons/fa';
+import { FaRobot, FaPaperPlane, FaTrash, FaUser, FaDumbbell, FaAppleAlt, FaHeartbeat, FaBolt, FaExclamationTriangle } from 'react-icons/fa';
 import api from '../../../services/api';
 import toast from 'react-hot-toast';
 
@@ -15,6 +15,20 @@ const quickPrompts = [
 
 // Renders a single AI message — parses bullet points, bold headings, and goal lines
 const AIMessageContent = ({ content }) => {
+  const isScopeRefusal = content.includes('Scope Constraint') || content.includes('I can only assist with workout');
+
+  if (isScopeRefusal) {
+    return (
+      <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 flex items-start gap-3 text-amber-200 shadow-md">
+        <FaExclamationTriangle className="text-amber-400 text-base shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <p className="font-extrabold text-[11px] uppercase tracking-wider text-amber-300">Workout & Diet Scope Only</p>
+          <p className="text-xs font-semibold leading-relaxed text-amber-100/90">{content.replace(/⚠️\s*\*\*Scope Constraint\*\*:\s*/, '')}</p>
+        </div>
+      </div>
+    );
+  }
+
   const lines = content.split('\n').filter(l => l.trim() !== '');
 
   return (

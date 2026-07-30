@@ -43,6 +43,7 @@ const userDietPlanSchema = new mongoose.Schema({
   }],
   completedMealsLog: [{
     date: { type: String, required: true },  // YYYY-MM-DD
+    dayNumber: { type: Number, default: 1 },
     meal: { type: String, required: true },  // Breakfast, Lunch, etc.
     status: { type: String, enum: ['Completed', 'Pending', 'Missed'], default: 'Pending' }
   }]

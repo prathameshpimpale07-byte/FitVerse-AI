@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FaDumbbell, FaRobot, FaTrophy, FaHistory, FaHeart, FaCog, 
@@ -17,7 +18,15 @@ import Favorites from './components/Favorites';
 import Records from './components/Records';
 
 const WorkoutHome = () => {
-  const [activeTab, setActiveTab] = useState('categories');
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabParam || 'categories');
+
+  useEffect(() => {
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
   const [userStats, setUserStats] = useState({ name: 'User', streak: 0, xp: 0, coins: 0 });
   const [activeWorkout, setActiveWorkout] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);

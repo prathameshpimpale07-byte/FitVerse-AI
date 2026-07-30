@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaTimes, FaPlay, FaDumbbell, FaFire, FaClock, FaExclamationTriangle, FaShieldAlt, FaSyncAlt } from 'react-icons/fa';
 import api from '../../../services/api';
+import { resolveExerciseVideo, formatEmbedUrl } from '../../../utils/exerciseVideoResolver';
 
 const getEmbedUrl = (url) => {
   if (!url) return '';
@@ -112,29 +113,16 @@ const ExerciseDetails = ({ exercise, onClose, onSelectAlternative }) => {
 
         {/* Video / Visual Segment */}
         <div className="w-full md:w-1/2 bg-slate-950 relative min-h-[350px] md:min-h-full">
-          {exercise.videoUrl ? (
-            <div className="absolute inset-0 w-full h-full">
-              <iframe
-                className="w-full h-full"
-                src={getEmbedUrl(exercise.videoUrl)}
-                title={exercise.exerciseName}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              ></iframe>
-            </div>
-          ) : exercise.imageUrl ? (
-            <img 
-              src={exercise.imageUrl} 
-              alt={exercise.exerciseName} 
-              className="w-full h-full object-cover flex-1" 
-            />
-          ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 gap-2">
-              <FaPlay size={40} className="animate-pulse text-primary-500" />
-              <span className="text-xs font-semibold">Video demonstration not available</span>
-            </div>
-          )}
+          <div className="absolute inset-0 w-full h-full">
+            <iframe
+              className="w-full h-full"
+              src={formatEmbedUrl(resolveExerciseVideo(exercise.exerciseName || exercise.title, [exercise]))}
+              title={exercise.exerciseName}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            ></iframe>
+          </div>
 
           {/* Quick Metrics Bar on top of media bottom */}
           <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent flex items-center justify-between text-white">
