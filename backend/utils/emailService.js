@@ -3,6 +3,13 @@ if (dns.setDefaultResultOrder) {
   dns.setDefaultResultOrder('ipv4first');
 }
 
+// Custom DNS lookup that explicitly forces Node to return IPv4 addresses only
+const customIPv4Lookup = (hostname, options, callback) => {
+  return dns.lookup(hostname, { family: 4, hints: dns.ADDRCONFIG }, (err, address, family) => {
+    callback(err, address, family);
+  });
+};
+
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
 
@@ -33,6 +40,7 @@ const getTransporter = async (overridePort = null, overrideHost = null) => {
         host: emailHost,
         port: emailPort,
         secure: emailSecure,
+        lookup: customIPv4Lookup, // CRITICAL: Overrides Nodemailer internal DNS lookup to strictly return IPv4 & bind to 0.0.0.0!
         pool: false,            // CRITICAL FOR RENDER: Disable connection pooling to prevent ENETUNREACH / stale socket errors
         family: 4,               // CRITICAL FOR RENDER: Force IPv4 DNS lookup to prevent ENETUNREACH on IPv6
         auth: {

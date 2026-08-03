@@ -6,6 +6,18 @@ import api from '../../../services/api';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 
+const formatSlotLabel = (s) => {
+  if (!s) return '';
+  const parts = s.split(':');
+  const h = parseInt(parts[0], 10);
+  if (isNaN(h)) return s;
+  const m = parts[1] || '00';
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  const pad12 = h12 < 10 ? `0${h12}` : h12;
+  return `${s} (${pad12}:${m} ${ampm})`;
+};
+
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -89,7 +101,7 @@ const MyBookings = () => {
                   </p>
                   <div className="flex items-center gap-4 text-xs font-bold text-slate-500 dark:text-slate-400">
                     <span className="flex items-center gap-1.5"><FaCalendarAlt /> {dayjs(booking.date).format('MMM D, YYYY')}</span>
-                    <span className="flex items-center gap-1.5"><FaClock /> {booking.slot}</span>
+                    <span className="flex items-center gap-1.5"><FaClock /> {formatSlotLabel(booking.slot)}</span>
                   </div>
                 </div>
               </div>

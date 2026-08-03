@@ -65,10 +65,28 @@ const TrainerProfile = () => {
   }
   if (!trainer) return null;
 
-  // Find available slots for selected date (mock logic based on day of week)
+  // Standard daily time slots (06:00 AM to 09:00 PM)
+  const defaultSlots = [
+    "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", 
+    "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", 
+    "18:00", "19:00", "20:00", "21:00"
+  ];
+
+  const formatSlotLabel = (s) => {
+    if (!s) return '';
+    const parts = s.split(':');
+    const h = parseInt(parts[0], 10);
+    if (isNaN(h)) return s;
+    const m = parts[1] || '00';
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    const pad12 = h12 < 10 ? `0${h12}` : h12;
+    return `${s} (${pad12}:${m} ${ampm})`;
+  };
+
   const selectedDay = date ? dayjs(date).format('ddd') : '';
   const availableDay = trainer.availability?.find(a => a.day === selectedDay);
-  const slotsToSelect = availableDay ? availableDay.slots : [];
+  const slotsToSelect = availableDay?.slots?.length ? availableDay.slots : defaultSlots;
 
   return (
     <div className="max-w-4xl mx-auto pb-16">
@@ -177,8 +195,8 @@ const TrainerProfile = () => {
                     <div>
                       <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Time Slot</label>
                       <select required disabled={!date} value={slot} onChange={e => setSlot(e.target.value)} className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-900 dark:text-white focus:ring-1 focus:ring-violet-500 focus:outline-none disabled:opacity-50">
-                        <option value="">{date ? (slotsToSelect.length ? 'Select a slot' : 'No slots available') : 'Select date first'}</option>
-                        {slotsToSelect.map(s => <option key={s} value={s}>{s}</option>)}
+                        <option value="">{date ? 'Select a time slot' : 'Select date first'}</option>
+                        {slotsToSelect.map(s => <option key={s} value={s}>{formatSlotLabel(s)}</option>)}
                       </select>
                       {date && !slotsToSelect.length && <p className="text-[10px] text-rose-500 mt-1 font-bold">Trainer is not available on {selectedDay}</p>}
                     </div>
