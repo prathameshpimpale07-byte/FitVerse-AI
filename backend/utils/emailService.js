@@ -1,3 +1,8 @@
+const dns = require('dns');
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
+
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
 
@@ -5,13 +10,14 @@ let transporter = null;
 
 /**
  * Get or initialize Nodemailer transporter.
- * Includes explicit timeouts and IPv4 forcing (`family: 4`) to prevent connection timeouts on cloud hosts like Render.
+ * Configured specifically for cloud hosts like Render with IPv4 forcing, pool: false, and explicit timeouts.
  * @param {number} [overridePort] Optional port override for fallback attempts
+ * @param {string} [overrideHost] Optional host override for fallback attempts
  */
-const getTransporter = async (overridePort = null) => {
+const getTransporter = async (overridePort = null, overrideHost = null) => {
   const emailUser = process.env.EMAIL_USER ? process.env.EMAIL_USER.trim() : null;
   const emailPass = process.env.EMAIL_PASS ? process.env.EMAIL_PASS.trim() : null;
-  const emailHost = process.env.EMAIL_HOST ? process.env.EMAIL_HOST.trim() : 'smtp.gmail.com';
+  const emailHost = overrideHost || (process.env.EMAIL_HOST ? process.env.EMAIL_HOST.trim() : 'smtp.gmail.com');
   
   // Default to port 587 (STARTTLS) or 465 (SSL)
   const defaultPort = process.env.EMAIL_PORT ? parseInt(process.env.EMAIL_PORT.trim(), 10) : 587;
@@ -27,6 +33,8 @@ const getTransporter = async (overridePort = null) => {
         host: emailHost,
         port: emailPort,
         secure: emailSecure,
+        pool: false,            // CRITICAL FOR RENDER: Disable connection pooling to prevent ENETUNREACH / stale socket errors
+        family: 4,               // CRITICAL FOR RENDER: Force IPv4 DNS lookup to prevent ENETUNREACH on IPv6
         auth: {
           user: emailUser,
           pass: emailPass,
@@ -37,7 +45,6 @@ const getTransporter = async (overridePort = null) => {
         connectionTimeout: 10000, // 10s connection timeout safeguard
         greetingTimeout: 10000,   // 10s greeting timeout safeguard
         socketTimeout: 15000,     // 15s socket timeout safeguard
-        family: 4,               // CRITICAL FOR RENDER: Force IPv4 DNS lookup to prevent IPv6 timeouts
       };
 
       if (process.env.EMAIL_SERVICE) {
@@ -57,12 +64,13 @@ const getTransporter = async (overridePort = null) => {
       host: 'smtp.ethereal.email',
       port: 587,
       secure: false,
+      pool: false,
+      family: 4,
       auth: {
         user: testAccount.user,
         pass: testAccount.pass,
       },
       connectionTimeout: 10000,
-      family: 4,
     });
   } catch (err) {
     console.error('[EmailService] Failed to create test email account:', err.message);
@@ -71,7 +79,7 @@ const getTransporter = async (overridePort = null) => {
 };
 
 /**
- * Send custom email with automatic fallback retry (e.g. switching between port 587 and 465 if Render blocks one).
+ * Send custom email with automatic fallback retries (trying alternative hosts/ports if Render encounters ENETUNREACH).
  * @param {object} mailOptions Standard nodemailer mail options
  */
 const sendMail = async (mailOptions) => {
@@ -96,28 +104,33 @@ const sendMail = async (mailOptions) => {
   } catch (primaryErr) {
     console.warn(`⚠️ [EmailService] Primary send attempt failed (${primaryErr.message}). Trying fallback configuration...`);
     
-    // Attempt fallback port (switch between 465 and 587)
-    try {
-      const emailUser = process.env.EMAIL_USER ? process.env.EMAIL_USER.trim() : null;
-      const emailPass = process.env.EMAIL_PASS ? process.env.EMAIL_PASS.trim() : null;
+    const emailUser = process.env.EMAIL_USER ? process.env.EMAIL_USER.trim() : null;
+    const emailPass = process.env.EMAIL_PASS ? process.env.EMAIL_PASS.trim() : null;
 
-      if (emailUser && emailPass) {
-        const currentPort = process.env.EMAIL_PORT ? parseInt(process.env.EMAIL_PORT.trim(), 10) : 587;
-        const fallbackPort = currentPort === 465 ? 587 : 465;
+    if (emailUser && emailPass) {
+      // Fallback attempts array: try alternative ports and hosts (e.g. smtp.googlemail.com or smtp-relay.gmail.com)
+      const fallbackConfigs = [
+        { port: 587, host: 'smtp.googlemail.com' },
+        { port: 465, host: 'smtp.gmail.com' },
+        { port: 587, host: 'smtp-relay.gmail.com' },
+      ];
 
-        const fallbackTransporter = await getTransporter(fallbackPort);
-        if (fallbackTransporter) {
-          const info = await fallbackTransporter.sendMail(mailOptions);
-          console.log(`✉️ [EmailService] Fallback email sent successfully to ${mailOptions.to} via port ${fallbackPort} | MessageID: ${info.messageId}`);
-          transporter = fallbackTransporter; // Cache working transporter
-          return info;
+      for (const config of fallbackConfigs) {
+        try {
+          const fallbackTransporter = await getTransporter(config.port, config.host);
+          if (fallbackTransporter) {
+            const info = await fallbackTransporter.sendMail(mailOptions);
+            console.log(`✉️ [EmailService] Fallback email sent successfully to ${mailOptions.to} via ${config.host}:${config.port} | MessageID: ${info.messageId}`);
+            transporter = fallbackTransporter; // Cache working transporter
+            return info;
+          }
+        } catch (fallbackErr) {
+          console.warn(`[EmailService] Fallback ${config.host}:${config.port} failed: ${fallbackErr.message}`);
         }
       }
-    } catch (fallbackErr) {
-      console.error('❌ [EmailService] Fallback transport also failed:', fallbackErr.message);
     }
 
-    console.error('❌ [EmailService] Failed to send email notification:', primaryErr.message);
+    console.error('❌ [EmailService] All SMTP delivery attempts failed:', primaryErr.message);
     return null;
   }
 };
