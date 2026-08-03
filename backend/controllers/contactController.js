@@ -1,5 +1,5 @@
 const Contact = require('../models/Contact');
-const nodemailer = require('nodemailer');
+const { sendMail } = require('../utils/emailService');
 
 exports.sendContactEmail = async (req, res) => {
   try {
@@ -38,20 +38,6 @@ exports.sendContactEmail = async (req, res) => {
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
       (async () => {
         try {
-          // Use Gmail service configuration for maximum compatibility
-          const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
-            auth: {
-              user: process.env.EMAIL_USER.trim(),
-              pass: process.env.EMAIL_PASS.trim(),
-            },
-            tls: {
-              rejectUnauthorized: false
-            }
-          });
-
           const adminEmail = process.env.EMAIL_USER.trim();
 
           // 1. Email to Admin with the user's message
@@ -140,9 +126,9 @@ exports.sendContactEmail = async (req, res) => {
             `
           };
 
-          // Send both emails
-          await transporter.sendMail(adminMailOptions);
-          await transporter.sendMail(userMailOptions);
+          // Send both emails using shared sendMail
+          await sendMail(adminMailOptions);
+          await sendMail(userMailOptions);
           console.log(`[Contact] Email sent successfully to admin (${adminEmail}) and user (${email}).`);
         } catch (emailErr) {
           console.error('[Contact] Failed to send email:', emailErr.message);

@@ -1,7 +1,7 @@
 var User = require('../models/User.js');
 var jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
+const { sendMail } = require("../utils/emailService");
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'dummy_client_id');
 
@@ -188,29 +188,8 @@ var generateToken = (id) => {
         const resetToken = user.getResetPasswordToken();
         await user.save({ validateBeforeSave: false });
 
-        const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
-
-        let transporter;
-        if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-          transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-              user: process.env.EMAIL_USER,
-              pass: process.env.EMAIL_PASS,
-            },
-          });
-        } else {
-          const testAccount = await nodemailer.createTestAccount();
-          transporter = nodemailer.createTransport({
-            host: "smtp.ethereal.email",
-            port: 587,
-            secure: false, 
-            auth: {
-              user: testAccount.user,
-              pass: testAccount.pass,
-            },
-          });
-        }
+        const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+        const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
 
         const mailOptions = {
           from: `"FitVerse AI" <${process.env.EMAIL_USER || 'noreply@fitverse.com'}>`,
@@ -225,9 +204,9 @@ var generateToken = (id) => {
         };
 
         try {
-          const info = await transporter.sendMail(mailOptions);
-          if (!process.env.EMAIL_USER) {
-            console.log("Password Reset Preview URL: %s", nodemailer.getTestMessageUrl(info));
+          const info = await sendMail(mailOptions);
+          if (!info) {
+            throw new Error('Failed to send email');
           }
           res.status(200).json({ success: true, message: 'Email sent' });
         } catch (err) {
